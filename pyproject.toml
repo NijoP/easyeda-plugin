@@ -18,6 +18,7 @@ mcp = ["mcp>=1.2"]
 [project.scripts]
 pcbflow = "pcbflow.cli:main"
 pcbflow-mcp = "pcbflow.mcp_server:main"
+pcbmunch = "pcbflow.munch_server:main"
 
 [tool.setuptools]
 packages = ["pcbflow"]
