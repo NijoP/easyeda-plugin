@@ -1,6 +1,6 @@
 # 14 · Contributing — for Humans and AI Agents
 
-Tracewright is meant to be used by both humans and AI agents, and to grow as each new
+AutoPCB is meant to be used by both humans and AI agents, and to grow as each new
 board teaches new lessons. This guide covers both audiences.
 
 ---

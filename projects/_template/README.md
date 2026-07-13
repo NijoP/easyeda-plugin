@@ -1,6 +1,6 @@
 # <Board name> — Project Workspace
 
-Scaffolded from the Tracewright `_template`. One folder per phase; fill each as you pass its
+Scaffolded from the AutoPCB `_template`. One folder per phase; fill each as you pass its
 gate. Start with `project.yaml` and Phase 1.
 
 ## Phase folders

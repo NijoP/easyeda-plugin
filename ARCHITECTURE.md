@@ -1,9 +1,9 @@
-# Tracewright Repository Architecture
+# AutoPCB Repository Architecture
 
-> **New to Tracewright?** Don't start here — start with the
+> **New to AutoPCB?** Don't start here — start with the
 > **[handbook](handbook/README.md)**. This document is a deeper structural reference
 > for when you want to understand *how the workspace is organized* (useful for
-> contributors and the curious, not required to use Tracewright).
+> contributors and the curious, not required to use AutoPCB).
 
 This document explains the *shape* of the repository: why each directory exists,
 who uses it, how the AI agents plug into it, where engineering knowledge lives,
@@ -15,7 +15,7 @@ Read this once and the whole repo becomes navigable.
 
 ## The mental model
 
-Tracewright separates four things that most PCB repos tangle together:
+AutoPCB separates four things that most PCB repos tangle together:
 
 | Concern | Lives in | Nature |
 |---|---|---|

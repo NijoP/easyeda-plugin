@@ -1,11 +1,18 @@
-# Tracewright
+# AutoPCB — Autonomous AI-Driven PCB Design (EasyEDA → KiCad)
 
-**Your AI bench engineer — from client brief to manufacturing-ready board.**
+**Autonomous AI PCB design workflow — take a hardware project from requirements to
+manufacturing-ready files, with the engineer in the loop.**
 
-Tracewright is an AI-assisted electronics engineering workspace. You bring the PCB and
-electronics knowledge; an AI assistant does the repetitive, error-prone work — wiring
-schematics, placing parts, routing, running checks — while **you make every engineering
-decision that matters.** You never have to write software.
+> **Keywords / Topics:** `pcb` · `pcb-design` · `autonomous` · `ai` · `llm` ·
+> `hardware-design` · `electronics` · `eda` · `kicad` · `easyeda` · `schematic` ·
+> `routing` · `pcb-automation` · `ai-agents`
+
+AutoPCB is an AI-assisted electronics engineering workspace for **automated PCB design**.
+You bring the PCB and electronics knowledge; an AI assistant does the repetitive,
+error-prone work — AI-driven **schematic generation, component placement, and routing**,
+plus every design check — while **you make every engineering decision that matters.** It
+works with **EasyEDA** and **KiCad** and any AI coding agent, and you never have to write
+software.
 
 > 👉 **New here? Start with the [handbook](handbook/README.md)** — a step-by-step guide
 > for electronics engineers, from installing the tools to shipping a board.
@@ -14,7 +21,7 @@ decision that matters.** You never have to write software.
 
 ## 1. What is this?
 
-Tracewright is a **workspace and a method**, not a program you run. You open it in a code
+AutoPCB is a **workspace and a method**, not a program you run. You open it in a code
 editor (VS Code), and an **AI assistant** reads the instructions in this repository and
 helps you design a PCB — doing the busywork and the checking, and stopping to ask you
 whenever a real engineering decision comes up.
@@ -22,7 +29,7 @@ whenever a real engineering decision comes up.
 **Why it was created:** PCB design is full of careful, repetitive, mistake-prone work —
 every net wired, every pin checked, every part placed, every trace sized, every rule
 verified. That work is perfect for a tireless assistant and wasteful for a skilled
-engineer. Tracewright hands it to an AI that follows a fixed set of engineering rules,
+engineer. AutoPCB hands it to an AI that follows a fixed set of engineering rules,
 and keeps *you* as the decision-maker.
 
 **What it solves:** drift between the spec and the board, layouts built on a wrong
@@ -101,7 +108,7 @@ reused for every board; only the board itself lives in `projects/`. Full explana
 
 ## 5. Supported AI tools
 
-Tracewright is **AI-model-agnostic.** It works with any AI coding assistant that can read
+AutoPCB is **AI-model-agnostic.** It works with any AI coding assistant that can read
 Markdown instructions and run tools inside VS Code:
 
 - **Claude Code** (Anthropic) — recommended
@@ -201,7 +208,7 @@ a real artifact; prefer updating over duplicating. Full guide:
 
 ## Provenance & license
 
-Tracewright was extracted from a real ESP32 robotics board designed with EasyEDA Pro +
+AutoPCB was extracted from a real ESP32 robotics board designed with EasyEDA Pro +
 KiCad and an AI assistant, **including the honest record of what went wrong** — see
 [`docs/13_LESSONS_LEARNED.md`](docs/13_LESSONS_LEARNED.md) and
 [`knowledge/learning-db.md`](knowledge/learning-db.md). You inherit the solutions without

@@ -1,135 +1,153 @@
-# Branding & Project Identity
+# Branding, Naming & Discoverability
 
-This document proposes the project's name, evaluates the options, and defines the
-full identity (tagline, mission, vision, principles, philosophy, goals). It is the
-source of truth for how the project presents itself for open-source release.
-
----
-
-## The naming problem
-
-The working codename **AXON** was unsuitable (it collides with well-known companies —
-Axon Enterprise — and several dev tools), and the repository name **easyeda-plugin**
-is both generic and *wrong*: this is not an EasyEDA plugin. It's a tool-agnostic,
-AI-assisted electronics engineering workspace that spans EasyEDA **and** KiCad and is
-designed to outlive either.
-
-**Naming conventions in the space** (studied for style): EDA/CAD tools favor coined or
-craft words (KiCad, Fritzing, LibrePCB, Horizon, Flux); AI dev tools favor short,
-punchy, ownable names (Cursor, Zed, Warp, Codeium, Devin, Continue). The sweet spot for
-this project: a name rooted in the **craft of building circuits**, short enough to own,
-professional enough for a startup, and not bound to any one EDA tool.
+This project's goal is **reach**: when an engineer searches GitHub for *pcb*,
+*autonomous pcb*, *ai pcb design*, or *hardware design automation*, this repo should
+surface. So the name and metadata are chosen for **search discoverability first**,
+brandability second. This document is the source of truth for the name, the GitHub
+metadata, and the project identity.
 
 ---
 
-## Name proposals
+## How GitHub discoverability actually works (the strategy)
 
-### 1. Tracewright  ⭐ recommended
-- **Meaning:** *trace* (the copper connections of a PCB) + *wright* (a skilled maker —
-  as in shipwright, wheelwright, playwright). "A craftsman of circuits."
-- **Why it fits:** the product's entire philosophy is *an AI craftsman doing the skilled,
-  repetitive work while the engineer stays the master.* "Wright" encodes that exactly.
-  "Trace" is universal to PCB work and tied to no single EDA tool.
-- **Advantages:** distinctive and likely available; professional; memorable; carries a
-  built-in story; scales to a startup; not EDA-specific.
-- **Disadvantages:** "wright" can be misheard as "write/right"; 11 characters.
+Stars follow *visibility × quality*. You control visibility through four fields,
+roughly in order of impact for a repo that doesn't have many stars yet:
 
-### 2. Boardsmith
-- **Meaning:** *board* + *smith* (a maker: blacksmith, wordsmith). "A smith who forges
-  boards."
-- **Why it fits:** warm, instantly clear, evokes craftsmanship and the AI-as-smith.
-- **Advantages:** immediately understood; friendly; memorable; easy to pronounce.
-- **Disadvantages:** "-smith" is a common suffix (less unique); "board" is a touch literal.
+1. **Topics (tags)** — the single biggest lever you fully control. GitHub's "Explore
+   topics" and topic search match these exactly. Set all of them.
+2. **Description** — matched heavily in search; must be keyword-dense and readable.
+3. **Repository name** — a strong keyword in the name ranks you for that keyword.
+4. **README** — the H1 and first paragraph are indexed; put the keywords there.
 
-### 3. Cuprum
-- **Meaning:** Latin for *copper* (the source of the symbol **Cu**) — the material every
-  PCB is made of.
-- **Why it fits:** premium, elegant, short; copper is the essence of a board.
-- **Advantages:** 6 letters, punchy, ownable, sophisticated.
-- **Disadvantages:** meaning isn't obvious to a layperson; a few existing uses.
+A poetic brand name (e.g. "Tracewright") scores 0 on all four for someone searching
+"autonomous pcb". A keyword-forward name + rich description + full topics scores on all
+four. **That is why the name is `AutoPCB`, not a coined word.**
 
-### 4. Voltaic
-- **Meaning:** of/producing electric current (from Volta, inventor of the battery).
-- **Why it fits:** broadly electronic, energetic, professional.
-- **Advantages:** pronounceable, familiar, positive.
-- **Disadvantages:** somewhat generic; several products already use "Voltaic".
-
-### 5. Netforge
-- **Meaning:** *net* (electrical nets) + *forge* (a place of making).
-- **Why it fits:** captures nets → fabricated board; "forge" is at home in OSS.
-- **Advantages:** clear making metaphor; strong sound.
-- **Disadvantages:** "forge" is heavily used (SourceForge, etc.); "net" is ambiguous.
-
-### 6. Padstack
-- **Meaning:** the PCB term for the stack of pads/vias through the board's layers.
-- **Why it fits:** deeply electronics-native, unique, technical.
-- **Advantages:** memorable to engineers; ownable.
-- **Disadvantages:** jargon; opaque outside the field.
+> Reality check: no repo ranks #1 for the bare term *pcb* (KiCad, etc. dominate with
+> tens of thousands of stars). You win the **specific, less-contested** queries —
+> *autonomous pcb*, *ai pcb design*, *llm pcb*, *ai eda*, *pcb design automation* —
+> where keyword match + a handful of stars is enough to reach the top.
 
 ---
 
-## Recommendation: **Tracewright**
+## Name proposals (scored for search + stars)
 
-It is the only option that captures the *product's actual identity* — an AI craftsman
-of circuits working under the engineer's judgment — while being distinctive, ownable,
-professional, pronounceable, tool-agnostic, and startup-ready. Boardsmith is the safest
-runner-up (most instantly understood); Cuprum is the premium alternative.
+### 1. AutoPCB  ⭐ recommended
+- **Meaning:** **Auto**(nomous / automation) + **PCB** — literally what it is.
+- **Search value:** contains the top keyword *pcb* and the differentiator *auto*; ranks
+  for "auto pcb", "autopcb", and (via description/topics) "autonomous pcb".
+- **Stars value:** short, memorable, pronounceable, easy to share and say aloud.
+- **Advantages:** keyword-bearing **and** brandable — the rare combination; startup-able.
+- **Disadvantages:** somewhat generic; verify `autopcb` isn't already taken on GitHub.
 
-> **Before committing:** verify availability of the GitHub org/repo, an npm/PyPI name if
-> relevant, a domain (tracewright.dev / .io), and do a light trademark check. This
-> document recommends the name; availability is a quick confirmation step for the owner.
+### 2. PCB-Copilot
+- **Meaning:** *pcb* + *copilot* (the now-standard word for an AI assistant).
+- **Search/stars:** rides the huge "copilot" search trend + the "pcb" keyword; signals
+  "AI assistant for PCBs" instantly, which attracts the AI crowd that gives stars.
+- **Disadvantages:** "copilot" is heavily used (mild dilution) and Microsoft-adjacent.
 
-**Repository name:** rename `easyeda-plugin` → **`tracewright`** (GitHub → Settings →
-General → Repository name; only the owner can do this).
+### 3. autonomous-pcb
+- **Meaning:** exact phrase match for the query "autonomous pcb".
+- **Search:** the strongest pure ranking for that exact search.
+- **Disadvantages:** reads as a slug, not a brand — weaker for word-of-mouth stars.
+
+### 4. AI-PCB-Designer
+- **Meaning:** matches "ai pcb design/designer".
+- **Search:** strong for the "ai pcb" family.
+- **Disadvantages:** long and descriptive rather than memorable.
+
+### 5. PCBForge
+- **Meaning:** *pcb* + *forge* (a place of making; common OSS suffix).
+- **Search/stars:** carries *pcb*, brandable, OSS-native feel.
+- **Disadvantages:** "forge" is crowded (SourceForge, many "*forge" repos).
+
+---
+
+## Recommendation: **AutoPCB**
+
+It is the only option that is **both** keyword-bearing (ranks for pcb/auto/autonomous)
+**and** brandable enough to earn word-of-mouth stars. `PCB-Copilot` is the strongest
+alternative if you want to ride the "copilot" trend; `autonomous-pcb` if you want the
+purest exact-match ranking for that one phrase.
+
+**Rename the GitHub repo** `easyeda-plugin` → **`autopcb`** (Settings → General →
+Repository name; owner-only). *Verify `autopcb` is free on GitHub first; if taken, use
+`autopcb-ai` or `ai-autopcb`.*
+
+---
+
+## The GitHub metadata to set (copy-paste)
+
+**Description** (About box — keyword-dense but readable):
+
+> Autonomous, AI-assisted PCB design workflow — takes a hardware project from
+> requirements to manufacturing-ready files. AI-driven schematic generation, component
+> placement, and routing with human-in-the-loop review. Works with EasyEDA + KiCad and
+> any AI coding agent (Claude Code, Codex, Cursor…).
+
+**Topics** (Settings → Topics — add all; these are the #1 discoverability lever):
+
+```
+pcb  pcb-design  pcb-layout  pcb-automation  autonomous  ai  artificial-intelligence
+llm  ai-agents  hardware  hardware-design  electronics  eda
+electronic-design-automation  kicad  easyeda  schematic  routing  automation  embedded
+```
+
+**Set them via the API** (or the UI). With a token that has `repo` scope:
+
+```bash
+# description
+curl -X PATCH -H "Authorization: Bearer <TOKEN>" \
+  https://api.github.com/repos/<owner>/autopcb \
+  -d '{"description":"Autonomous, AI-assisted PCB design workflow — requirements to manufacturing (EasyEDA + KiCad)."}'
+# topics
+curl -X PUT -H "Authorization: Bearer <TOKEN>" \
+  -H "Accept: application/vnd.github+json" \
+  https://api.github.com/repos/<owner>/autopcb/topics \
+  -d '{"names":["pcb","pcb-design","pcb-layout","pcb-automation","autonomous","ai","llm","ai-agents","hardware","hardware-design","electronics","eda","kicad","easyeda","schematic","routing","automation","embedded"]}'
+```
+
+---
+
+## More stars, beyond the name
+
+- A clear README **hero** with the keywords in the first line (done).
+- A short **demo GIF / screenshots** of a board going through the workflow (highest-ROI
+  addition when the live pipeline is validated).
+- Submit to **awesome-lists** (awesome-electronics, awesome-eda, awesome-ai-tools).
+- A **"Show HN" / Reddit r/PrintedCircuitBoard / r/embedded** post when there's a live
+  demo.
+- Keep the topics current; add `good-first-issue` labels to invite contributors.
 
 ---
 
 ## Project identity
 
-**Tagline (primary):** *Your AI bench engineer — from client brief to manufacturing-ready board.*
-Alternates: *"Design boards, not scripts."* · *"The AI craftsman for electronics engineers."*
+**Tagline:** *Autonomous AI PCB design — from requirements to manufacturing, with you in the loop.*
 
 **Mission:** Automate the repetitive, error-prone work of PCB design — net-by-net wiring,
-placement, routing, checking — so electronics engineers spend their time on judgment, not
-busywork, while every engineering decision stays human.
+placement, routing, checking — so electronics engineers spend their time on judgment,
+not busywork, while every engineering decision stays human.
 
 **Vision:** Every electronics engineer works alongside a tireless, disciplined AI
 collaborator that carries a design from requirements to manufacturing, learns from every
-board, and never lets the engineer lose control of a single decision that matters.
+board, and never lets the engineer lose control of a decision that matters.
 
-**Core principles** (the non-negotiables the whole system is built on):
-1. **Knowledge is the source; geometry is the build artifact** — protect the thinking,
-   regenerate the drawings.
-2. **Place nothing over wrong** — never build a stage on an unverified one.
-3. **Verify against reality, never the tool's own report.**
-4. **Autonomy by reversibility** — the AI runs free on replayable work; a human gates
-   anything irreversible; the fab order is always human.
-5. **The verdict is the unit of progress** — PASS / CONDITIONAL / FAIL, not "done."
-6. **Two engineers in one** — the AI holds a software-engineer and a hardware-engineer
-   persona at once, and the hardware persona can veto.
-7. **Fail loud, heal quietly** — surface problems in plain English; recover automatically
-   where safe.
-8. **Knowledge compounds** — every project makes the framework smarter.
+**Core principles:** knowledge is the source / geometry is the build artifact · place
+nothing over wrong · verify against reality · autonomy by reversibility · the verdict is
+the unit of progress · two engineers in one (SW + HW, HW can veto) · fail loud, heal
+quietly · knowledge compounds.
 
-**Design philosophy:** engineering-first (start from the objective, not the code),
-human-in-the-loop by default, tool-agnostic (EasyEDA + KiCad today, more later),
-AI-model-agnostic, and honest about its limits.
-
-**Long-term goals:** a fully documented, self-healing, cross-platform workspace; a
-growing shared knowledge base across projects; support for more EDA backends and AI
-agents; and — eventually — a board you can *recompile* from its knowledge with one
-command.
+**Design philosophy:** engineering-first, human-in-the-loop, tool-agnostic (EasyEDA +
+KiCad today), AI-model-agnostic, honest about limits.
 
 ---
 
-## Rename follow-up checklist (mechanical, low-risk)
+## Rename follow-up checklist
 
-Documentation is rebranded to **Tracewright** in this release. Remaining optional
-mechanical steps, safe to do anytime:
-- [ ] Rename the GitHub repo `easyeda-plugin` → `tracewright` (owner-only).
-- [ ] Rename internal Python module `tools/axon_log.py` → e.g. `tools/runlog.py` (+ its
-      imports in `test_axon_log.py`, `test_heal.py`).
-- [ ] Rename the Chrome profile clone dir `axon-eda-chrome` → `tracewright-eda-chrome`
-      (in `tools/platform_utils.py`).
-- [ ] Optionally add a `tracewright` CLI wrapper so tools run as `tracewright doctor`
-      instead of `python3 tools/doctor.py`.
+Docs are rebranded to **AutoPCB**. Remaining optional mechanical steps:
+- [ ] Rename the GitHub repo `easyeda-plugin` → `autopcb` (owner-only) + set the
+      description & topics above.
+- [ ] Rename internal module `tools/axon_log.py` → `tools/runlog.py` (+ imports in
+      `test_axon_log.py`, `test_heal.py`).
+- [ ] Rename the Chrome profile clone dir `axon-eda-chrome` (in `tools/platform_utils.py`).

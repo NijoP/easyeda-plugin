@@ -1,4 +1,4 @@
-# Tracewright Reliability & Self-Healing
+# AutoPCB Reliability & Self-Healing
 
 This section is an **audit and a design**, not implemented code (yet). It maps every
 way the workspace can fail, judges how well the system currently detects and recovers,
