@@ -104,8 +104,37 @@ python3 tools/test_reliability.py    # Phase 2: diagnose + retry + idempotency
 python3 tools/test_heal.py           # Phase 3: heal engine + humanize + recovery checks
 ```
 
-## What's next
+## Cross-platform tools (Phase 4)
 
-Phases 1–3 are built. Phases 4–5 (cross-platform hardening for Windows/macOS; the
-optional schematic-alignment tidy pass) are in
+Portable replacements for the Linux-only bash pieces — work on Linux, macOS, Windows:
+```bash
+python3 tools/launch_easyeda.py --dry-run   # clone profile + launch Chrome w/ debug port
+python3 tools/drc.py <board.kicad_pcb> <ruleset.kicad_pro>   # DRC + KI-6 guard, portable
+```
+`platform_utils.py` holds the per-OS Chrome/profile/lock logic and minimum tool versions.
+
+## Schematic tidy (Phase 5)
+
+Fixes the cosmetic §7 alignment limitation — de-collides and grid-snaps schematic block
+positions:
+```bash
+python3 tools/tidy_schematic.py blocks.json --gap 1.0 --pitch 2.54
+```
+Pure geometry (tested); the live measure/apply needs an EasyEDA session.
+
+## Tests (all pass)
+
+```bash
+python3 tools/test_axon_log.py     # Phase 1
+python3 tools/test_reliability.py  # Phase 2
+python3 tools/test_heal.py         # Phase 3
+python3 tools/test_platform.py     # Phase 4
+python3 tools/test_tidy.py         # Phase 5
+```
+
+## Status
+
+**All five reliability phases are built and tested.** The pieces that touch a live
+EasyEDA/KiCad session or a non-Linux OS (Chrome launch, renderer/session recovery, live
+schematic apply) still need real-world validation — noted in each module and in
 [`../reliability/ROADMAP.md`](../reliability/ROADMAP.md).

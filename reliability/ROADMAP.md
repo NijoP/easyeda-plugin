@@ -71,7 +71,14 @@ Outcome: the top-5 S1 risks become auto-recovered or safely checkpointed.
 
 Outcome: an engineer sees plain-English instructions, never a stack trace.
 
-## Phase 4 — Cross-platform hardening
+## Phase 4 — Cross-platform hardening · ✅ BUILT
+
+> **Implemented** in [`../tools/`](../tools/): `platform_utils.py` (per-OS Chrome/
+> profile/lock resolution + min versions), `launch_easyeda.py` (portable Chrome
+> launcher replacing the bash rsync recipe; `--dry-run` testable anywhere), and
+> `drc.py` (portable DRC with the KI-6 ruleset guard, replacing the bash `drc.sh`).
+> Tests pass (`test_platform.py`). The launch itself still needs validation on
+> macOS/Windows; the path logic and guards are tested cross-platform.
 
 11. Port the Bash pieces (`drc.sh`, the Chrome launch recipe) to a cross-platform
     runner; add macOS + Windows/PowerShell recipes; the doctor selects per-OS.
@@ -79,7 +86,12 @@ Outcome: an engineer sees plain-English instructions, never a stack trace.
 
 Outcome: works on Ubuntu, macOS, and Windows, not just Linux.
 
-## Phase 5 — Optional polish
+## Phase 5 — Optional polish · ✅ BUILT
+
+> **Implemented** in [`../tools/tidy_schematic.py`](../tools/tidy_schematic.py): the
+> pure de-collision + grid-snap algorithm for the §7 alignment limitation, fully
+> tested (`test_tidy.py`). The live measure (`getPrimitivesBBox`) and apply
+> (`setState`) need an EasyEDA session; the geometry is done and tested offline.
 
 13. Schematic **measured-bbox tidy pass** (the §7 alignment limitation) — de-collide
     symbols and snap blocks to a bus grid. Cosmetic; do only if engineers ask.
