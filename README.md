@@ -95,6 +95,7 @@ Full detail per phase: [`workflow/`](workflow/) and the [handbook](handbook/READ
 | [`projects/`](projects/) | **Your boards live here** — one folder per project, with all its files and outputs. |
 | [`tools/`](tools/) | Reliability helpers: the environment check (`doctor`), logging, and self-healing recovery. |
 | [`reliability/`](reliability/) | How the workspace detects and recovers from problems + the [troubleshooting guide](reliability/TROUBLESHOOTING.md). |
+| [`architecture/`](architecture/) | **Architecture audit & target design** — learnings from EasyEDA/KiCad, the tool-agnostic architecture, and the implementation roadmap. |
 | [`docs/`](docs/) | Deep reference material. *Optional — for later, or for contributors.* |
 
 Why the structure: the **method** (`workflow/`), the **workers** (`agents/`), the
