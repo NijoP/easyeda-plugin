@@ -9,6 +9,12 @@ phases 3 (init), 4 (schematic generation), and 9 (placement).
   engine (part search, passive picking, wire-by-net-name, stub direction) plus a
   per-block CONFIG. Copy it, fill the CONFIG from `build_sheet.md`, run it in
   *EasyEDA ▸ Settings ▸ Extensions ▸ Standalone Script*.
+- [`api_probe.js`](api_probe.js) — **run this first.** Discovers the real library-search
+  method, the `create()` return shape, and the pin field names on *your* EasyEDA build
+  (the Pro API varies by build), so the other scripts use the right names.
+- [`dump_schematic.js`](dump_schematic.js) — dumps the live schematic to JSON
+  (`{components, wires}`) for headless verification; feed it to
+  [`../browser/recon.py`](../browser/recon.py) via the CDP driver.
 
 ## The API contracts (that work)
 

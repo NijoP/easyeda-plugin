@@ -40,6 +40,26 @@ A wrong `*.create` or a blocking modal freezes the renderer. Recover at the
 **browser level**: `Target.createTarget` (fresh tab) → `Target.closeTarget` (hung
 tab). Prevention: never probe `*.create` in a loop; save often.
 
-Full recipe + the CDP driver design: [`../../docs/07_BROWSER_AUTOMATION.md`](../../docs/07_BROWSER_AUTOMATION.md).
-`cdp.py` (the driver) and `recon.py` (the reconstructor) are the two files most
-worth lifting verbatim into a new project.
+> **Cross-platform launch:** instead of the bash recipe above, run
+> `python3 tools/launch_easyeda.py` (Windows: `python tools\launch_easyeda.py`) — it
+> clones the profile, clears locks, and launches Chrome with the debug port on any OS.
+
+## Files (runnable)
+
+| File | What it does |
+|---|---|
+| [`cdp.py`](cdp.py) | the CDP driver — `eval` JS in the editor tab, `shot` a screenshot, `tabs` / `version` |
+| [`recon.py`](recon.py) | rebuild the netlist (pin → net) from a schematic dump |
+| [`test_recon.py`](test_recon.py) | test for the reconstructor (`python3 automation/browser/test_recon.py`) |
+
+## The verification pipeline
+
+```bash
+python3 tools/launch_easyeda.py                                   # open EasyEDA (debug port)
+python3 automation/browser/cdp.py eval automation/easyeda/dump_schematic.js > dump.json
+python3 automation/browser/recon.py dump.json netlist.json       # rebuild the netlist
+python3 automation/browser/cdp.py shot board.png                 # optional sanity screenshot
+```
+Then diff `netlist.json` against `net_connection.md` — that's the phase-5 audit.
+
+Full CDP design: [`../../docs/07_BROWSER_AUTOMATION.md`](../../docs/07_BROWSER_AUTOMATION.md).
