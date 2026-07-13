@@ -1,133 +1,114 @@
-# AXON — An AI-Native Electronics Engineering Workflow
+# AXON — An AI-Native Electronics Engineering Workspace
 
-> A reusable, open method for taking a hardware product from a client brief to a
-> manufacturable PCB — where **an AI agent is the engineer, the EDA tool is the
-> compiler, and a human gates everything irreversible.**
+> A modular, open framework that takes a hardware product from **client
+> requirements to manufacturing-ready outputs** — with AI agents doing the
+> engineering, browser automation + EasyEDA + KiCad as the tooling, and a human
+> supervising every irreversible step.
 >
-> Works for any board: IoT nodes, robotics, motor controllers, audio, sensors,
-> power electronics, wearables. Swap the parts and net names; the method is the
-> same.
+> Not a prompt-engineering repo. An **engineering framework** that is reusable for
+> any electronics project: IoT, robotics, motor control, audio, sensors, power,
+> wearables.
 
-**→ New here? Read [`DESIGN_WORKFLOW.md`](DESIGN_WORKFLOW.md) — the step-by-step
-design method, written for electronics engineers who've never seen this flow.**
+**→ New here? Read [`DESIGN_WORKFLOW.md`](DESIGN_WORKFLOW.md) — the 12-phase design
+method, written for electronics engineers who've never seen this flow.**
+**→ Want the structure? Read [`ARCHITECTURE.md`](ARCHITECTURE.md).**
 
 ---
 
-## Why this exists
+## The core idea
 
-Most PCB projects treat the *schematic* as the design. This one doesn't. It treats
-two plain documents — a **build sheet** (every part, pin, net) and a **net
-dictionary** (every net → every connected pin) — as the real source, and treats the
-schematic, placement, and routed copper as **build output generated from them.**
+Most PCB projects treat the *schematic* as the design. AXON doesn't. It treats a
+small set of authored documents — the **build sheet**, the **net dictionary**, and
+the **design rules** — as the real source, and treats the schematic, placement,
+and routed copper as **build output generated from them.**
+
+> **Knowledge is the source. Geometry is the build artifact.**
+
+Protect and version the knowledge; regenerate the geometry. A cheap verification
+gate follows every stage, so nothing is ever built on top of something wrong.
+
+---
+
+## The 12-phase workflow
+
+EasyEDA hosts the schematic + placement; **KiCad is the routing and verification
+engine** (its API can script pours, zones, and DRC — EasyEDA's cannot). Each phase
+has a hard exit gate; you never start a phase until the previous one passes.
+
+| # | Phase | Tool | Exit gate |
+|---|---|---|---|
+| 1 | Requirement analysis & feasibility | — | feasibility study complete, no unquantified requirement |
+| 2 | BOM planning | — | every part validated (India + LCSC + lifecycle + package/electrical) |
+| 3 | EasyEDA project initialization | EasyEDA | sheets + board params + stackup set |
+| 4 | Autonomous schematic generation | EasyEDA | every block placed & wired, 0 unmatched pins |
+| 5 | Schematic audit | browser | netlist == source docs; 0 shorts/floating/ERC |
+| 6 | Placement planning (client constraints) | — | board dims/shape/connector/keep-out defined |
+| 7 | Placement knowledge graph | — | functional/thermal/EMI/current graph complete |
+| 8 | Visual placement planning | — | placement map approved against client needs |
+| 9 | Automated component placement | EasyEDA | 0 spacing violations (real geometry), constraints met |
+| 10 | Export to KiCad | EasyEDA→KiCad | imported board verified == EasyEDA, placement preserved |
+| 11 | AI-assisted routing | KiCad | 0 unrouted, DRC-clean, IPC widths, return paths |
+| 12 | Final verification | KiCad | DRC+ERC+DFM+assembly+BOM all pass → manufacturing-ready |
+
+Full detail per phase → [`workflow/`](workflow/). Deep dive → [`DESIGN_WORKFLOW.md`](DESIGN_WORKFLOW.md).
+
+---
+
+## Repository structure
 
 ```
-        ┌─────────────────────────────────────────────────────────┐
-        │  KNOWLEDGE  is the SOURCE.   GEOMETRY  is the ARTIFACT.  │
-        └─────────────────────────────────────────────────────────┘
-
-   build_sheet.md + net_connection.md + design_rules.json   ← the SOURCE of the board
-      │
-      │   generate  (deterministic scripts + AI reasoning; the EDA tool = compiler)
-      ▼
-   schematic → placement → routing → gerbers                ← BUILD OUTPUT (regenerable)
-      │
-      │   verify  (real geometry, real DRC — never the tool's own self-report)
-      ▼
-   PASS / CONDITIONAL / FAIL verdict  ← the gate that unlocks the next stage
+axon/
+├── DESIGN_WORKFLOW.md   START HERE — the 12-phase method for engineers
+├── ARCHITECTURE.md      why the repo is shaped this way (read this second)
+├── CLAUDE.md / AGENTS.md  AI operating manuals
+├── CONTRIBUTING.md      for humans and AI agents
+│
+├── workflow/     THE 12-PHASE PIPELINE — one gated file per phase
+├── agents/       AI worker roles (feasibility, BOM, schematic, placement, router, …)
+├── automation/   the tools that touch the EDA world
+│   ├── easyeda/    schematic + placement (Standalone-Script engine)
+│   ├── browser/    headless CDP driver + netlist reconstruction
+│   ├── kicad/      routing + verification engine (pours, DRC, stitching)
+│   └── shared/     IPC-2221 solver, units, congestion grid
+├── knowledge/    the engineering brain that COMPOUNDS across projects
+│   ├── principles.md · knowledge-graph.md · design-standards.md
+│   ├── learning-db.md  (append-only failure→lesson log)
+│   └── knowledge-inheritance.md
+├── templates/    source-of-truth blanks (build_sheet, net_connection, rules, …)
+├── projects/     per-board workspaces that INHERIT the framework
+│   └── _template/  scaffold: one folder per phase + project.yaml manifest
+└── docs/         the reference library (philosophy, patterns, lessons, V2)
 ```
 
-That one inversion, plus a cheap verification gate after every stage, is the whole
-framework. It was reverse-engineered from a real, multi-month PCB project (an
-ESP32-based robotics board designed in EasyEDA Pro, driven by an AI agent over ~30
-sessions) — **including the honest record of what went wrong**, so you inherit the
-solutions without paying the tuition.
+Every directory's purpose, contributor use, AI-agent interaction, and the
+cross-project inheritance model are explained in [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ---
 
-## The method in one screen
+## Start a new board
 
-**Ten stages, each with a hard exit gate. You never start a stage until the
-previous one passes review** ("place nothing over wrong"). Inside every stage:
-*generate one unit → review → fix → next.*
-
-| # | Stage | Exit gate |
-|---|---|---|
-| 0 | Capture requirements | every requirement quantified |
-| 1 | Architecture & feasibility | size + layer count justified by density & current math |
-| 2 | Components & sourcing | every part datasheet-verified & sourced |
-| 3 | Source-of-truth docs | build sheet ↔ net dictionary agree net-for-net |
-| 4 | Generate schematic (section by section) | every section wired, 0 unmatched pins |
-| 5 | Verify schematic (headless, net-by-net) | reconstructed netlist == source docs, 0 shorts |
-| 6 | Placement | 0 spacing violations (real geometry) + practical + approved |
-| 7 | Routing plan | 0 unclassed nets, feasibility scored |
-| 8 | Route the board | 0 unrouted, DRC-clean vs the board's own ruleset |
-| 9 | DRC / DFM / handoff | fab DFM pass, package **committed**, order by a human |
-
-Full walkthrough → [`DESIGN_WORKFLOW.md`](DESIGN_WORKFLOW.md). Deep reference →
-[`docs/01_METHODOLOGY.md`](docs/01_METHODOLOGY.md).
-
----
-
-## What's in this repo
-
+```bash
+cp -r projects/_template projects/my-board
+cp templates/build_sheet.template.md   projects/my-board/04_schematic/build_sheet.md
+cp templates/net_connection.template.md projects/my-board/04_schematic/net_connection.md
 ```
-.
-├── DESIGN_WORKFLOW.md   ← START HERE: the step-by-step design method (for engineers)
-├── README.md            ← this file
-├── CLAUDE.md            ← the AI operating manual (drop into any project)
-├── AGENTS.md            ← the agent roster + how AI agents use this repo
-├── docs/                ← the deep reference
-│   ├── 00_PHILOSOPHY.md            first principles & why it's shaped this way
-│   ├── 01_METHODOLOGY.md           the 10 gated stages in full detail
-│   ├── 02_ARCHITECTURE.md          the 5-layer system architecture
-│   ├── 03_KNOWLEDGE_GRAPH.md       extracted engineering intelligence (heuristics)
-│   ├── 04_HUMAN_IN_THE_LOOP.md     the autonomy ladder + task classification
-│   ├── 05_BOTTLENECKS.md           every pain point → a reusable solution
-│   ├── 06_EASYEDA_INTEGRATION.md   the EDA-tool API contracts & hard limits
-│   ├── 07_BROWSER_AUTOMATION.md    driving a cloud EDA tool headlessly (CDP)
-│   ├── 08_PROMPT_AND_AGENT_STRATEGY.md  personas, swarms, verdict-gating
-│   ├── 09_VALIDATION.md            DRC ground truth & real-geometry audit
-│   ├── 10_MEMORY_AND_STATE.md      cross-session memory & state persistence
-│   ├── 11_REUSABLE_SYSTEMS.md      catalog of every tool (IO/deps/failure/reuse)
-│   ├── 12_DESIGN_PATTERNS.md       the recurring patterns, named
-│   ├── 13_LESSONS_LEARNED.md       the honest ledger (successes & failures)
-│   ├── 14_CONTRIBUTING.md          human + AI contribution guide
-│   ├── 15_ROADMAP.md               where this goes next
-│   └── 16_VERSION_2.md             the ideal rebuild-from-zero design
-└── templates/           ← fill-in-the-blank artifacts for a new board
-    ├── build_sheet.template.md         the tick-sheet (parts, pins, nets)
-    ├── net_connection.template.md      the net dictionary + membership oracle
-    ├── design_rules.template.json      net-class DRC rulebook
-    ├── route_sequence.template.json    the ordered, DRC-gated routing plan
-    ├── trace_width_table.template.json IPC-2221 current→width table
-    ├── placement.template.json         region plan + coordinates + refdes silk
-    └── section_generator.template.js   the board-agnostic schematic-gen engine
-```
+Then point an AI agent at [`CLAUDE.md`](CLAUDE.md): *"follow the workflow, start
+phase 1 for projects/my-board."* The agent walks the 12 phases, running the
+replayable work autonomously and stopping for your sign-off on the irreversible
+steps (placement approval, go-ahead to route, DRC sign-off, fab order). Every
+lesson it learns flows back into `knowledge/` — so your **next** board starts
+smarter.
 
 ---
 
-## Quickstart on your own board
+## Provenance & honesty
 
-1. `cp -r templates/ my-board/` and rename.
-2. Fill `build_sheet.template.md` and `net_connection.template.md` from your brief
-   (stages 0–3). **These two files are your board.**
-3. Point your AI agent at [`CLAUDE.md`](CLAUDE.md): *"follow the method, build the
-   next section."*
-4. Run the loop — generate one section → verify → fix → next. The AI runs the
-   replayable work; you own the gates (placement approval, go-ahead to route, DRC
-   sign-off, and placing the fab order).
-
----
-
-## Status & provenance
-
-Extracted from a real ESP32 robotics board (40×55 mm, 4-layer, EasyEDA Pro + KiCad,
-AI-driven). Every heuristic in [`docs/`](docs/) traces to a real artifact, a real
-failure, or a real code path. Where the origin project's own process was *wrong*,
-that's recorded as a finding, not hidden — see
-[`docs/13_LESSONS_LEARNED.md`](docs/13_LESSONS_LEARNED.md).
+Extracted from a real ESP32 robotics board (EasyEDA Pro + KiCad, AI-driven, ~30
+sessions), **including the record of what went wrong** — see
+[`docs/13_LESSONS_LEARNED.md`](docs/13_LESSONS_LEARNED.md) and
+[`knowledge/learning-db.md`](knowledge/learning-db.md). You inherit the solutions
+without paying the tuition.
 
 ## License
 
-[MIT](LICENSE). Use it, fork it, adapt it to your bench. If it saves you a lost
-board or a re-routed layout, it did its job.
+[MIT](LICENSE).

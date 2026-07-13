@@ -1,192 +1,149 @@
-# The AXON Design Method — Step by Step
+# The AXON Design Method — 12 Phases, Step by Step
 
 > **For the electronics engineer reading this repo for the first time.**
-> This is how we actually take a hardware product from a client conversation to a
-> manufacturable PCB. It's a normal, rigorous EE flow — schematic → placement →
-> routing → gerbers — but reorganized around one idea and driven by an AI agent
-> working alongside a human engineer. Read this page and you'll understand the
-> whole process; the `docs/` folder is the deep reference behind each step.
+> This is how we take a hardware product from a client conversation to a
+> manufacturing-ready PCB. It's a rigorous EE flow — feasibility → BOM →
+> schematic → placement → routing → verification — reorganized around one idea and
+> driven by AI agents working under human supervision. Read this page and you
+> understand the whole method; [`workflow/`](workflow/) is the gate-by-gate
+> reference and [`ARCHITECTURE.md`](ARCHITECTURE.md) is the repo structure.
 
 ---
 
-## The one idea to understand first
+## The idea to grasp first
 
-We treat a PCB project as having two kinds of thing:
+Two kinds of thing exist in a PCB project:
 
-- **Knowledge** — the requirements, the net list, the part choices, the design
-  rules, the "this is a 4-layer board because of the 10 A motor rail" reasoning.
-  This is *authored, reviewed, and version-controlled.* It is the **source code**
-  of the board.
-- **Geometry** — the schematic drawing, the placement coordinates, the routed
-  copper, the gerbers. This is *generated* from the knowledge, and — if the
-  knowledge is intact — it can be **regenerated on demand.** It is the **build
-  output.**
+- **Knowledge** — requirements, the net list, part choices, design rules, the
+  reasoning ("4-layer because of the 10 A motor rail"). Authored, reviewed,
+  versioned. The **source code** of the board.
+- **Geometry** — the schematic, placement, routed copper, gerbers. *Generated*
+  from the knowledge, and regenerable if the knowledge is intact. The **build
+  output**.
 
 > **Knowledge is the source. Geometry is the build artifact.**
 
-So the two files that *are* the board are not the schematic — they're two plain
-documents: a **build sheet** (every part, every pin, every net) and a **net
-dictionary** (every net → every pin that touches it). Get those right and the
-schematic, placement, and routing become a build step over them.
+So the files that *are* the board aren't the schematic — they're the **build
+sheet** (every part, pin, net), the **net dictionary** (every net → every pin),
+and the **design rules**. Get those right and the rest is a build step.
 
-Everything else in the method follows from this. (Full rationale:
-[`docs/00_PHILOSOPHY.md`](docs/00_PHILOSOPHY.md).)
+## Who does what — and the rule for deciding
 
----
-
-## Who does what
-
-| The **AI agent** does | The **human engineer** does |
-|---|---|
-| Requirements analysis, architecture, feasibility math | Confirms the brief; signs the constraint verdict |
-| BOM research + datasheet verification | Makes cost/feature/UX calls |
-| Writes the two source-of-truth docs | Reviews them electrically |
-| Generates the schematic (scripts) | Runs the scripts in the EDA tool; runs Annotate |
-| Verifies the schematic net-by-net (headless) | Confirms the verdict |
-| Computes the placement + routing plan | Approves placement (usability); gives the go-ahead to route |
-| Guides routing + runs DRC | Does the interactive routing; signs DRC before fab |
-| Packages gerbers/BOM/CPL | **Places the fab order** (never the AI) |
-
-The rule for *who* decides is not "who's smarter" — it's **reversibility**. If an
-action can be replayed (analysis, planning, a re-derivable edit), the AI just does
-it. If it's a live change to the shared design or spends money, a human gates it.
-(Full tiers: [`docs/04_HUMAN_IN_THE_LOOP.md`](docs/04_HUMAN_IN_THE_LOOP.md).)
-
----
+The AI runs the analysis, generation, and validation; the human owns judgment and
+anything irreversible. The rule isn't "who's smarter" — it's **reversibility**: if
+an action can be replayed (analysis, planning, a re-derivable edit) the AI just
+does it; if it's a live change to the shared design or spends money, a human gates
+it. (Full tiers: [`docs/04_HUMAN_IN_THE_LOOP.md`](docs/04_HUMAN_IN_THE_LOOP.md).)
 
 ## The tools
 
-- **EasyEDA Pro** — the schematic/PCB tool. It has a JavaScript API (paste-and-run
-  "Standalone Scripts") we use to generate schematics, and it can be driven
-  headlessly through the browser (Chrome DevTools Protocol) so the AI can read the
-  real board back and verify it.
-- **Scripts** — a small, board-agnostic engine (part search, passive picking,
-  wire-by-net-name) plus a per-board data block. See
-  [`templates/section_generator.template.js`](templates/section_generator.template.js).
-- **KiCad `kicad-cli`** — used as an independent DRC ground-truth and for
-  manufacturing export when needed.
+- **EasyEDA Pro** — schematic + placement, driven by its JavaScript API and read
+  back headlessly through the browser (Chrome DevTools Protocol).
+- **KiCad** — the **routing and verification engine.** Routing is done here, *not*
+  in EasyEDA, because KiCad's `pcbnew`/`kicad-cli` API can script pours, zones,
+  stitching, and DRC. EasyEDA's API cannot, so we hand the board to KiCad after
+  placement.
+- **PADS export** bridges EasyEDA → KiCad, carrying nets and placement intact.
 
-Any of these is swappable — the method is the constant, the tool is the backend.
-(Integration details: [`docs/06_EASYEDA_INTEGRATION.md`](docs/06_EASYEDA_INTEGRATION.md),
-[`docs/07_BROWSER_AUTOMATION.md`](docs/07_BROWSER_AUTOMATION.md).)
+## The golden rule
 
----
-
-## The golden rule of the flow
-
-**You never start a stage until the previous stage passes review.** Every stage
-ends in a written verdict — **PASS / CONDITIONAL (with a numbered fix list) /
-FAIL** — and a failing verdict *blocks* the next stage. We call this *"place
-nothing over wrong."* It sounds obvious; violating it (routing over a schematic
-that still had 22 shorts) cost the origin project weeks of thrown-away layout.
-
-And the inner loop inside every stage is always the same:
-
-```
-   generate ONE unit  →  review it  →  fix it  →  next unit
-```
-
-One unit = one schematic section, one placement region, one routing phase. We
-never generate the whole board and review at the end — a bug found late costs the
-whole board; a bug found per-section costs one section.
+**You never start a phase until the previous phase passes review.** Every phase
+ends in a written verdict — **PASS / CONDITIONAL (numbered fixes) / FAIL** — and a
+failing verdict *blocks* the next phase ("place nothing over wrong"). Inside each
+phase, the loop is always *generate one unit → review → fix → next.*
 
 ---
 
-## The 10 steps
+## Phase 1 — Requirement analysis & feasibility study
+The workflow begins when a client provides requirements. **Before any schematic
+work,** produce a feasibility study: functional analysis, technical feasibility,
+cost estimate, manufacturing feasibility, power budget, hardware architecture,
+risk assessment, and complexity estimate. A quick density check (component area ÷
+board area) and a current check (any rail needing >~5 A ⇒ a plane ⇒ ≥4 layers)
+catch "this won't fit / this can't be 2-layer" in minutes.
+**Gate:** feasibility complete; no unquantified requirement. **Human:** approves
+the project.
 
-### Step 0 — Capture the requirements
-Turn the brief (a call, a sketch, a PDF) into a **numbered requirement register**.
-Every requirement gets a number and a source. Conflicts are surfaced, not quietly
-reconciled. **Gate:** nothing left unquantified.
-*Watch for:* a dimensional spec that's already impossible — a quick
-component-area estimate catches "this won't fit" in five minutes instead of at
-layout.
+## Phase 2 — BOM planning
+Once approved, generate the BOM. Every part is chosen by engineering rules:
+**Indian-market availability, LCSC availability, cost optimization, long-term
+availability, preferred manufacturers, package compatibility, electrical
+compatibility, lead time, manufacturing constraints.** Verify each part by
+decoding its manufacturer/LCSC ID against the spec (a fuzzy search once dropped a
+12 pF cap and a 2.2 µH inductor into µF slots). **Gate:** BOM fully validated.
+**Human:** signs cost/feature trades.
 
-### Step 1 — Architecture & feasibility
-Decide the block partition, the power rails, the **board size**, and the **layer
-count** — each with the math that forces it. Two calculations do most of the work:
-- **Density → size:** `courtyard area ÷ board area × 2`. Below ~25% routes easily on
-  2-layer; above ~45% you need 4-layer or an interactive finish.
-- **Current → layers:** if any rail's peak current can't be carried by a
-  manufacturable trace (~5 A on 1 oz copper), that current must ride a **copper
-  plane**, which means ≥4 layers. *You add layers for amps, then use them for
-  routing — not the other way around.*
+## Phase 3 — EasyEDA project initialization
+Create the EasyEDA project, create the schematic **sheets** (one project, multiple
+pages — never separate files, or nets won't merge), configure board parameters,
+and **select the stackup** (2/4/6-layer) from the feasibility verdict. **Gate:**
+project structure + stackup set.
 
-**Gate:** size and layer count justified by numbers. **Human:** signs off board
-size (it's a cost/UX call).
+## Phase 4 — Autonomous schematic generation
+Using the approved BOM and the EasyEDA API + browser automation + Node.js scripts,
+generate the schematic: create/place symbols, wire connections **by net name**,
+organize blocks, verify interfaces, follow best practices. Parts are token-matched
+(never blindly the first search result); array parts rejected. **Human
+intervention only where an engineering decision needs approval.** **Gate:** every
+block wired, 0 unmatched pins; run project-wide Annotate.
 
-### Step 2 — Components & sourcing
-Build a BOM where every part is **datasheet-verified** and sourcable, with a second
-source noted. Verify a part by decoding its **manufacturer/LCSC ID**, not the
-search string (a fuzzy search once dropped a 12 pF cap and a 2.2 µH inductor into
-µF slots). Check the boring things that bite: does the module have the right
-antenna variant? does the regulator survive a depleted battery? **Human:** makes
-the cost/feature trades.
+## Phase 5 — Schematic audit
+Before any PCB work, audit the schematic completely: the AI reads the real board
+back, **reconstructs the netlist** from wire coordinates, and checks **missing
+nets, floating pins, shorts, ERC violations, power integrity, signal integrity,
+net-naming consistency, interface validation, datasheet compliance, design
+completeness.** This runs in seconds and catches what the eye misses. **Gate:**
+all checks pass. *This cheap gate protects every hour of layout downstream.*
 
-### Step 3 — Write the two source-of-truth docs
-Author the **build sheet** and the **net dictionary** in lockstep — they must agree
-net-for-net; on conflict, the net dictionary wins. The net dictionary's membership
-table (every net → every connected pin) becomes the oracle we verify against later.
-**Gate:** the two docs agree; analog ground has exactly one tie point; every IC is
-decoupled. *This is the highest-leverage step — get it right and the schematic
-generator can be dumb and deterministic.*
-(Templates: [`build_sheet.template.md`](templates/build_sheet.template.md),
-[`net_connection.template.md`](templates/net_connection.template.md).)
+## Phase 6 — Component placement planning
+PCB placement does **not** start yet. First the **client defines** the physical
+constraints: board dimensions, board shape, connector locations, USB location,
+sensor positions, MCU location, mounting holes, keep-out regions, mechanical
+constraints, and any placement preferences. **Gate:** constraints captured.
 
-### Step 4 — Generate the schematic, section by section
-For each functional block (USB, charger, MCU, each sensor, motors, …), fill a small
-CONFIG block — the parts and passives from the build sheet — and run the generator
-script in EasyEDA. It searches the library (token-matched, never blindly the first
-result), places the parts, and **wires each pin to its net by name.** The human runs
-each script and runs project-wide **Annotate** afterward (designators aren't
-scriptable). **Gate:** every section placed and wired, zero unmatched pins.
+## Phase 7 — Placement knowledge graph
+Before placing anything, build a placement knowledge graph describing: functional
+blocks, component relationships, placement priorities, thermal considerations,
+high-current paths, analog/digital separation, EMI-sensitive regions, mechanical
+constraints, routing complexity, manufacturing considerations. **Gate:** the graph
+is complete — no component is placed before this.
 
-### Step 5 — Verify the schematic (the cheap gate that saves everything)
-The AI reads the *real* board back headlessly, **reconstructs the netlist** from the
-wire coordinates, and **diffs it against the net dictionary.** Zero shorts, zero
-single-pin nets, zero floating pins. This runs in seconds and catches what the eye
-misses. **Run it before any PCB work — never as an afterthought.**
-(How: [`docs/09_VALIDATION.md`](docs/09_VALIDATION.md).)
+## Phase 8 — Visual placement planning
+Generate a **visual placement map** before writing any automation: functional
+zones, power zones, signal flow, connector/sensor locations, high-speed regions,
+thermal regions, ground strategy, future routing channels. Evaluate it against the
+client's requirements and **iterate until it satisfies them.** **Gate:** placement
+plan approved.
 
-### Step 6 — Placement
-Partition the board (quiet logic / sensors in the centre / noisy power+motors),
-size each part's real courtyard, hug decoupling caps to their IC (≤2 mm), orient
-parts to current flow, and put edge parts (USB, connectors, button, battery,
-antenna) **on the edge, opening outward.** Then audit spacing on **real pad
-geometry** (not the tool's model). **Gate:** zero spacing violations *and* the
-layout is practically assemblable — a client judges a board by "can I build and
-use this," not by wirelength. **Human:** approves the placement.
+## Phase 9 — Automated component placement
+Once the plan is approved: generate Node.js automation, inject it into EasyEDA,
+place all components, and **validate on real pad geometry** (never the placer's own
+model). If constraints are violated, repeat until the layout satisfies all of them.
+**Gate:** 0 spacing violations + practical + approved. **Human:** approves.
 
-### Step 7 — Plan the routing (before drawing any copper)
-Produce three machine-readable rulebooks:
-- **Design rules** — every net sorted into a class (GND plane, power, motor, USB
-  diff pair, gate, analog, signal…) with its width and clearance. *Zero nets left
-  unclassed.*
-- **Trace-width table** — each net's IPC-2221 current→width; anything needing
-  >~5 mm becomes a plane/pour, not a trace.
-- **Route sequence** — the **order** of routing: define planes → route the hardest
-  critical nets first (diff pairs, fast SPI) → constrained auto-route the bulk →
-  and pour ground **last** (pouring early strands open nets).
+## Phase 10 — Export to KiCad
+Routing is **not** done in EasyEDA. Export the PCB in **PADS** (or another
+compatible) format, import into KiCad, and **verify the imported board matches the
+EasyEDA design** — placement preserved, 0 dropped footprints, sub-µm position
+residual. (Mounting holes may not survive the export → restore and re-verify.)
+**Gate:** import fidelity verified.
 
-**Gate:** feasibility scored above threshold; plan frozen.
-(Templates in [`templates/`](templates/); strategy in
-[`docs/01_METHODOLOGY.md`](docs/01_METHODOLOGY.md).)
+## Phase 11 — AI-assisted routing (in KiCad)
+KiCad is the routing engine; routing is AI-assisted automation that considers **IPC
+standards, trace-width/current capacity, differential pairs, high-speed signals,
+ground returns, EMI reduction, thermal performance, manufacturability, layer
+optimization.** Order: planes → hardest criticals first → constrained auto-route →
+power pours → **ground pour + stitching last.** Iterate until all design rules are
+satisfied. **Gate:** 0 unrouted; DRC-clean vs the board's ruleset (KiCad
+`kicad-cli` with the `.kicad_pro` sibling — never a bare board file). **Human:**
+go-ahead before routing begins.
 
-### Step 8 — Route the board
-Apply the ruleset, then route in the sequence above. The AI drives everything it
-can and hands the human a **precise plan** for the parts the tool's API can't
-automate (copper pours and fine-pitch escapes are interactive in EasyEDA). Ground
-pour and stitching vias go in **last**, collision-checked. **Gate:** zero unrouted,
-and **DRC clean against the board's own ruleset in the board's own tool** — never
-cross tools (that's a phantom-clean trap). **Human:** gives the go-ahead to start
-drawing copper.
-
-### Step 9 — DRC, DFM & manufacturing handoff
-Export gerbers (including inner layers), drill, pick-and-place, and BOM; run the
-fab's DFM check; **commit the whole package to git** (an uncommitted board is one
-mistake away from gone — the origin project lost two finished boards this way).
-**Human:** signs the DFM report and **places the fab order** — the one thing the AI
-never does.
+## Phase 12 — Final verification
+A complete engineering review: **DRC, ERC, manufacturing review, silkscreen
+review, assembly review, mechanical review, BOM validation, final documentation.**
+Export gerbers/drill/CPL/BOM and **commit the package** (an uncommitted board is one
+mistake from gone). **Only then is the project manufacturing-ready.** **Human:**
+signs the DFM report and **places the fab order** — the one thing the AI never does.
 
 ---
 
@@ -194,31 +151,21 @@ never does.
 
 | Traditional | AXON |
 |---|---|
-| The schematic *is* the design | Two text docs are the design; the schematic is generated from them |
-| Progress = "I drew more" | Progress = a dated PASS/CONDITIONAL/FAIL verdict per stage |
-| Verify at the end (ERC/DRC) | A cheap verification gate after **every** stage |
+| The schematic *is* the design | Build sheet + net dictionary + rules are the design; geometry is generated |
+| Progress = "I drew more" | Progress = a dated PASS/CONDITIONAL/FAIL verdict per phase |
+| Verify at the end | A cheap verification gate after **every** phase |
 | Trust the tool's "0 errors" | Verify against **real geometry + the correctly-configured DRC** |
-| Lose a board file = redo it by hand | Regenerate geometry from the intact knowledge layer |
-| One engineer, start to finish | AI on the replayable 90%; human on judgment + the irreversible |
+| Route in the schematic tool | Placement in EasyEDA, **routing in KiCad** (scriptable pours/DRC) |
+| Lose the board file → redo by hand | Regenerate geometry from the intact knowledge layer |
+| One engineer, start to finish | AI on the replayable 90%; human owns judgment + the irreversible |
+| Every project starts from zero | Every project **inherits** prior learnings (`knowledge/`) |
 
-Nothing here replaces engineering judgment — the whole point of the human gates is
-that the calls that matter (safety, power sizing, DRC sign-off, ordering) stay with
-a person. What the method removes is the *avoidable* waste: drift between the spec
-and the board, layouts built on a wrong schematic, and boards lost because nobody
-committed them.
+Nothing here replaces engineering judgment — the human gates exist precisely so the
+calls that matter (safety, power sizing, DRC sign-off, ordering) stay with a
+person. What the method removes is the *avoidable* waste: drift between spec and
+board, layouts built on a wrong schematic, and boards lost because nobody committed
+them.
 
----
-
-## Try it on your own board
-
-1. Copy [`templates/`](templates/) into a new project folder.
-2. Fill the build sheet and net dictionary from your brief (Steps 0–3).
-3. Point an AI agent at [`CLAUDE.md`](CLAUDE.md) and say *"follow the method, build
-   the next section."*
-4. Work the loop: generate one section → verify → fix → next. Let the AI run the
-   replayable work; you own the gates.
-
-The deep reference for every step is in [`docs/`](docs/). If you only read two more
-pages, read [`docs/00_PHILOSOPHY.md`](docs/00_PHILOSOPHY.md) (why it's shaped this
-way) and [`docs/13_LESSONS_LEARNED.md`](docs/13_LESSONS_LEARNED.md) (the honest
-account of what went wrong and how the method fixes it).
+Deep reference for every phase → [`workflow/`](workflow/). Why it's shaped this way
+→ [`docs/00_PHILOSOPHY.md`](docs/00_PHILOSOPHY.md). The honest record of what went
+wrong → [`docs/13_LESSONS_LEARNED.md`](docs/13_LESSONS_LEARNED.md).
