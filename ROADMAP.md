@@ -50,7 +50,7 @@ internal reliability build plan lives in
 
 Every electronics engineer has a disciplined AI collaborator that carries a design from
 brief to manufacturing, gets smarter with every board, and never takes an irreversible
-decision out of human hands. See [`BRANDING.md`](BRANDING.md) for the full vision.
+decision out of human hands.
 
 > Status legend: ✅ built & tested · 🚧 in progress / needs validation · 🔭 planned ·
 > 🧪 research · 🌟 vision.
