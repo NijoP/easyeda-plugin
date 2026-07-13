@@ -1,5 +1,10 @@
 # AXON Repository Architecture
 
+> **New to AXON?** Don't start here — start with the
+> **[handbook](handbook/README.md)**. This document is a deeper structural reference
+> for when you want to understand *how the workspace is organized* (useful for
+> contributors and the curious, not required to use AXON).
+
 This document explains the *shape* of the repository: why each directory exists,
 who uses it, how the AI agents plug into it, where engineering knowledge lives,
 and how a new project inherits everything learned before it.

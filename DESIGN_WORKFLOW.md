@@ -1,5 +1,9 @@
 # The AXON Design Method — 12 Phases, Step by Step
 
+> **Want a gentler, hands-on walkthrough?** Use the
+> **[handbook](handbook/README.md)** instead — it teaches the same 12 steps with
+> tool setup, examples, and checklists. This page is the concise reference version.
+
 > **For the electronics engineer reading this repo for the first time.**
 > This is how we take a hardware product from a client conversation to a
 > manufacturing-ready PCB. It's a rigorous EE flow — feasibility → BOM →

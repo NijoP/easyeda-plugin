@@ -1,114 +1,142 @@
-# AXON — An AI-Native Electronics Engineering Workspace
+# AXON — An AI-Assisted Electronics Engineering Workspace
 
-> A modular, open framework that takes a hardware product from **client
-> requirements to manufacturing-ready outputs** — with AI agents doing the
-> engineering, browser automation + EasyEDA + KiCad as the tooling, and a human
-> supervising every irreversible step.
->
-> Not a prompt-engineering repo. An **engineering framework** that is reusable for
-> any electronics project: IoT, robotics, motor control, audio, sensors, power,
-> wearables.
+**Design a professional PCB — from a client's requirements to manufacturing-ready
+files — with an AI engineering assistant doing the repetitive work and you making
+the engineering calls.**
 
-**→ New here? Read [`DESIGN_WORKFLOW.md`](DESIGN_WORKFLOW.md) — the 12-phase design
-method, written for electronics engineers who've never seen this flow.**
-**→ Want the structure? Read [`ARCHITECTURE.md`](ARCHITECTURE.md).**
+You bring the electronics knowledge. AXON brings a disciplined, repeatable process
+and an AI assistant that runs the tools for you. You never have to learn to program.
+
+> 👉 **New here? Start with the handbook:** [`handbook/`](handbook/README.md) — a
+> step-by-step guide from installing the tools to shipping a board. If you read one
+> thing, read [`handbook/01-introduction.md`](handbook/01-introduction.md).
 
 ---
 
-## The core idea
+## What is this?
 
-Most PCB projects treat the *schematic* as the design. AXON doesn't. It treats a
-small set of authored documents — the **build sheet**, the **net dictionary**, and
-the **design rules** — as the real source, and treats the schematic, placement,
-and routed copper as **build output generated from them.**
+AXON is a **workspace and a method**, not a program you run. You open it in a code
+editor (VS Code), and an **AI assistant** (such as Claude Code) reads the
+instructions in this repository and helps you design a PCB by:
 
-> **Knowledge is the source. Geometry is the build artifact.**
+- studying the client requirements and doing a feasibility study,
+- planning the Bill of Materials,
+- drawing the schematic in EasyEDA,
+- checking the schematic for errors,
+- planning and placing the components,
+- routing the board in KiCad,
+- and preparing the manufacturing files.
 
-Protect and version the knowledge; regenerate the geometry. A cheap verification
-gate follows every stage, so nothing is ever built on top of something wrong.
+**You stay in control.** The AI does the busywork and the checking; you approve every
+important engineering decision.
 
----
+## Who is it for?
 
-## The 12-phase workflow
+**Electronics engineers** — people who know PCB design, schematics, BOMs, and
+manufacturing. You do **not** need to know programming, APIs, or automation. Where a
+software idea matters, the handbook explains it in plain language (and the
+[glossary](handbook/glossary.md) is always one click away).
 
-EasyEDA hosts the schematic + placement; **KiCad is the routing and verification
-engine** (its API can script pours, zones, and DRC — EasyEDA's cannot). Each phase
-has a hard exit gate; you never start a phase until the previous one passes.
+## What problem does it solve?
 
-| # | Phase | Tool | Exit gate |
-|---|---|---|---|
-| 1 | Requirement analysis & feasibility | — | feasibility study complete, no unquantified requirement |
-| 2 | BOM planning | — | every part validated (India + LCSC + lifecycle + package/electrical) |
-| 3 | EasyEDA project initialization | EasyEDA | sheets + board params + stackup set |
-| 4 | Autonomous schematic generation | EasyEDA | every block placed & wired, 0 unmatched pins |
-| 5 | Schematic audit | browser | netlist == source docs; 0 shorts/floating/ERC |
-| 6 | Placement planning (client constraints) | — | board dims/shape/connector/keep-out defined |
-| 7 | Placement knowledge graph | — | functional/thermal/EMI/current graph complete |
-| 8 | Visual placement planning | — | placement map approved against client needs |
-| 9 | Automated component placement | EasyEDA | 0 spacing violations (real geometry), constraints met |
-| 10 | Export to KiCad | EasyEDA→KiCad | imported board verified == EasyEDA, placement preserved |
-| 11 | AI-assisted routing | KiCad | 0 unrouted, DRC-clean, IPC widths, return paths |
-| 12 | Final verification | KiCad | DRC+ERC+DFM+assembly+BOM all pass → manufacturing-ready |
-
-Full detail per phase → [`workflow/`](workflow/). Deep dive → [`DESIGN_WORKFLOW.md`](DESIGN_WORKFLOW.md).
+PCB design has a lot of careful, repetitive, error-prone work: wiring every net,
+checking every pin, placing every part, sizing every trace, running every check.
+AXON hands that work to an AI assistant that is fast, tireless, and follows a fixed
+set of engineering rules — while keeping *you*, the engineer, as the decision-maker.
+It also remembers what it learned on past boards, so every project starts smarter
+than the last.
 
 ---
 
-## Repository structure
+## Who does what
+
+| You (the engineer) decide… | The AI assistant does… |
+|---|---|
+| What the product must do (requirements) | The feasibility study and the math (density, current, cost) |
+| Which parts to use (final BOM approval) | Researching parts, availability, and datasheets |
+| The board size, shape, and connector positions | Drawing the schematic and placing the components |
+| Whether a placement is practical | Checking the schematic and the placement for errors |
+| Go-ahead to start routing | Routing the board and running the design-rule checks |
+| **Placing the manufacturing order** (always you) | Preparing the gerbers, BOM, and assembly files |
+
+**The simple rule:** the AI does anything that can be re-done if it's wrong
+(analysis, drawing, checking). You approve anything that changes the live design or
+that can't be undone — and *you* always place the fab order.
+
+## Which tool does what
+
+- **EasyEDA** — where the **schematic** is drawn and the **components are placed**.
+- **KiCad** — where the board is **routed** and the final **design checks** run.
+- The AI moves the design from EasyEDA to KiCad for you and keeps them in sync.
+
+(Why the split? KiCad can be automated for routing and rule-checking in ways EasyEDA
+cannot. You don't need to worry about this — the AI handles the handoff.)
+
+---
+
+## The workflow, at a glance
 
 ```
-axon/
-├── DESIGN_WORKFLOW.md   START HERE — the 12-phase method for engineers
-├── ARCHITECTURE.md      why the repo is shaped this way (read this second)
-├── CLAUDE.md / AGENTS.md  AI operating manuals
-├── CONTRIBUTING.md      for humans and AI agents
-│
-├── workflow/     THE 12-PHASE PIPELINE — one gated file per phase
-├── agents/       AI worker roles (feasibility, BOM, schematic, placement, router, …)
-├── automation/   the tools that touch the EDA world
-│   ├── easyeda/    schematic + placement (Standalone-Script engine)
-│   ├── browser/    headless CDP driver + netlist reconstruction
-│   ├── kicad/      routing + verification engine (pours, DRC, stitching)
-│   └── shared/     IPC-2221 solver, units, congestion grid
-├── knowledge/    the engineering brain that COMPOUNDS across projects
-│   ├── principles.md · knowledge-graph.md · design-standards.md
-│   ├── learning-db.md  (append-only failure→lesson log)
-│   └── knowledge-inheritance.md
-├── templates/    source-of-truth blanks (build_sheet, net_connection, rules, …)
-├── projects/     per-board workspaces that INHERIT the framework
-│   └── _template/  scaffold: one folder per phase + project.yaml manifest
-└── docs/         the reference library (philosophy, patterns, lessons, V2)
+   Client requirement
+        ↓   Feasibility study
+   BOM planning
+        ↓   Component selection
+   EasyEDA project creation
+        ↓   Autonomous schematic generation
+   Schematic review
+        ↓
+   Placement planning  →  Placement knowledge graph  →  Automated placement
+        ↓   Export to KiCad
+   AI routing
+        ↓   Design verification
+   Manufacturing package
 ```
 
-Every directory's purpose, contributor use, AI-agent interaction, and the
-cross-project inheritance model are explained in [`ARCHITECTURE.md`](ARCHITECTURE.md).
+Each step has a clear checkpoint. You don't move to the next step until the current
+one is confirmed correct. Full walkthrough:
+[`handbook/`](handbook/README.md) and [`DESIGN_WORKFLOW.md`](DESIGN_WORKFLOW.md).
 
 ---
 
-## Start a new board
+## What you need
 
-```bash
-cp -r projects/_template projects/my-board
-cp templates/build_sheet.template.md   projects/my-board/04_schematic/build_sheet.md
-cp templates/net_connection.template.md projects/my-board/04_schematic/net_connection.md
-```
-Then point an AI agent at [`CLAUDE.md`](CLAUDE.md): *"follow the workflow, start
-phase 1 for projects/my-board."* The agent walks the 12 phases, running the
-replayable work autonomously and stopping for your sign-off on the irreversible
-steps (placement approval, go-ahead to route, DRC sign-off, fab order). Every
-lesson it learns flows back into `knowledge/` — so your **next** board starts
-smarter.
+| Thing | What it's for | How to get it |
+|---|---|---|
+| **VS Code** | the workspace you open this repo in | [handbook step 2](handbook/02-installing-tools.md) |
+| **An AI assistant** (Claude Code, Codex, OpenCode, …) | the assistant that reads this repo and helps you | [handbook step 2](handbook/02-installing-tools.md) |
+| **EasyEDA Pro** (free account) | schematic + placement | [handbook step 2](handbook/02-installing-tools.md) |
+| **KiCad** (free) | routing + verification | [handbook step 2](handbook/02-installing-tools.md) |
+| **Git** (installed once, mostly invisible) | saves and publishes your work | [handbook step 2](handbook/02-installing-tools.md) |
+
+**Skills required:** PCB and electronics knowledge. **No programming required.**
 
 ---
 
-## Provenance & honesty
+## Where things live (the repository map)
 
-Extracted from a real ESP32 robotics board (EasyEDA Pro + KiCad, AI-driven, ~30
-sessions), **including the record of what went wrong** — see
-[`docs/13_LESSONS_LEARNED.md`](docs/13_LESSONS_LEARNED.md) and
-[`knowledge/learning-db.md`](knowledge/learning-db.md). You inherit the solutions
-without paying the tuition.
+| Folder | In plain terms |
+|---|---|
+| [`handbook/`](handbook/) | **Start here.** The step-by-step guide for engineers. |
+| [`workflow/`](workflow/) | The 12 design steps, each explained with its checkpoint. |
+| [`agents/`](agents/) | The "job descriptions" for the AI helpers (one per step). |
+| [`automation/`](automation/) | The tools the AI uses to drive EasyEDA and KiCad. *You don't touch these.* |
+| [`knowledge/`](knowledge/) | The engineering rules and lessons the AI follows. |
+| [`templates/`](templates/) | Blank forms you fill in for a new board (parts list, net list, rules). |
+| [`projects/`](projects/) | **Your boards live here** — one folder per project, with all its files and outputs. |
+| [`docs/`](docs/) | Deep reference material. *Optional — for later, or for contributors.* |
+| Root files (`CLAUDE.md`, `AGENTS.md`) | Instruction sheets the **AI** reads. You don't need to. |
+
+---
+
+## Where to begin
+
+1. Read [`handbook/01-introduction.md`](handbook/01-introduction.md) (10 minutes).
+2. Install the tools: [`handbook/02-installing-tools.md`](handbook/02-installing-tools.md).
+3. Create your first project: [`handbook/04-your-first-project.md`](handbook/04-your-first-project.md).
+
+Then just talk to your AI assistant in plain English. It will walk you through the
+rest.
 
 ## License
 
-[MIT](LICENSE).
+[MIT](LICENSE) — free to use, adapt, and share.
