@@ -47,8 +47,44 @@ Design: [`../reliability/SELF_HEALING.md`](../reliability/SELF_HEALING.md) §1.
 python3 tools/test_axon_log.py    # PASS = envelope never swallows, schema correct
 ```
 
+## `diagnose.py` — classify a failure (Phase 2)
+
+Turns a raw error into a known fault class + plain-English explanation + whether it's
+safe to retry.
+```bash
+python3 tools/diagnose.py "kicad-cli: command not found"
+python3 tools/diagnose.py --http 401 "Unauthorized"
+python3 tools/diagnose.py --log projects/<board>/.logs/<phase>.jsonl   # last failure
+```
+
+## `recover.py` — retry safely (Phase 2)
+
+`retry(fn, ...)` retries transient faults (rate limits, timeouts, server hiccups) with
+backoff, but **refuses to re-run a non-idempotent live write** (a failed write must not
+double-apply). `safe_run(logger, step, fn)` combines retry + structured logging.
+
+## `state.py` — checkpoint & resume (Phase 2)
+
+```bash
+python3 tools/state.py checkpoint <project> <phase>   # commit a phase's work (ST-1)
+python3 tools/state.py resume <project>               # find where to pick up (ST-2/5)
+```
+`checkpoint` commits so work can never be lost; `resume` reads the manifest + git and
+tells you the exact next step without repeating completed work.
+
+Plus a hardened guard: `automation/kicad/drc.sh` now **refuses to run without a
+ruleset** (`.kicad_pro`), making the phantom-DRC failure (KI-6) impossible by
+construction.
+
+## Tests
+
+```bash
+python3 tools/test_axon_log.py       # Phase 1: logging envelope + schema
+python3 tools/test_reliability.py    # Phase 2: diagnose + retry + idempotency
+```
+
 ## What's next
 
-Phase 1 is these two tools. Phases 2–5 (auto-diagnosis, retry wrappers, autonomous
-resume, per-subsystem recovery, cross-platform hardening) are in
+Phases 1–2 are built. Phases 3–5 (renderer-hang / session auto-recovery, Chrome & KiCad
+import recovery, the human-friendly error layer, cross-platform hardening) are in
 [`../reliability/ROADMAP.md`](../reliability/ROADMAP.md).

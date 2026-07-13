@@ -27,8 +27,10 @@ if [[ -n "$RULESET" ]]; then
 fi
 
 if [[ ! -f "$PRO_SIBLING" ]]; then
-  echo "drc.sh: WARNING — no sibling .kicad_pro next to the board." >&2
-  echo "drc.sh: results will use DEFAULT rules and may be PHANTOM-CLEAN. Supply a ruleset." >&2
+  echo "drc.sh: ERROR — no ruleset (.kicad_pro) beside the board." >&2
+  echo "drc.sh: refusing to run — a bare board reports DEFAULT rules as clean (phantom DRC, KI-6)." >&2
+  echo "drc.sh: pass a ruleset:  drc.sh <board.kicad_pcb> <ruleset.kicad_pro>" >&2
+  exit 3
 fi
 
 REPORT="${BOARD%.kicad_pcb}.drc.rpt"

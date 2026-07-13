@@ -39,7 +39,12 @@ Build the two things that turn *invisible* failures into *handled* ones:
 
 Outcome: no more cryptic mid-task deaths; every failure is recorded and named.
 
-## Phase 2 — Diagnose & recover the common faults
+## Phase 2 — Diagnose & recover the common faults · ✅ BUILT
+
+> **Implemented** in [`../tools/`](../tools/): `diagnose.py` (fault classification),
+> `recover.py` (backoff retry + idempotency guard), `state.py` (checkpoint + resume),
+> and the KI-6 guard (`automation/kicad/drc.sh` now refuses to run without a ruleset).
+> Tests pass. See [`../tools/README.md`](../tools/README.md).
 
 3. **Fault classification** — map each caught error to a `VULNERABILITY_REPORT` id.
 4. **Retry wrappers** — backoff for 429/5xx/timeouts, with idempotency guards
