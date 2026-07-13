@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pcbflow"
+version = "0.1.0"
+description = "AI-assisted PCB design harness — from requirements to manufacturing (EasyEDA + KiCad)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = ["websockets>=10"]   # only used by the headless EasyEDA driver (automation/browser/cdp.py)
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+pcbflow = "pcbflow.cli:main"
+
+[tool.setuptools]
+packages = ["pcbflow"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
