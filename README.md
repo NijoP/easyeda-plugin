@@ -129,13 +129,19 @@ Markdown (`CLAUDE.md`, `AGENTS.md`, `workflow/`), which any capable agent can fo
 | **Git** | saves & publishes your work | yes |
 | **Chrome** | so the AI can read your live EasyEDA board | yes (from phase 3) |
 | **Python 3.9+** | runs the reliability helpers | yes |
-| **Node.js 18+** | some automation scripts | when automation runs |
+| **Node.js 18+** | the EasyEDA Bridge + some automation scripts | when automation runs |
 
 **Skills required:** electronics and PCB knowledge. **No programming required.**
 
-> 🪟 **On Windows?** PCB Flow works on Windows (where most hardware engineers are). Just
-> use `python` (or `py`) instead of `python3`, and the `.py` tools instead of the `.sh`
-> scripts. Full guide: **[handbook/windows-setup.md](handbook/windows-setup.md)**.
+> 💡 **EasyEDA transport.** The recommended way for the AI to drive EasyEDA is the official
+> **Bridge** — install the `run-api-gateway` extension in EasyEDA Pro, tick *"allow external
+> interaction"*, and run the bridge server (needs Node.js). Setup:
+> [`automation/easyeda/README.md`](automation/easyeda/README.md). A raw Chrome-DevTools
+> fallback (`tools/launch_easyeda.py`) is used automatically if the Bridge isn't running.
+
+> 🖥️ **Platform setup:** **[Windows](handbook/windows-setup.md)** ·
+> **[macOS](handbook/macos-setup.md)** · Linux (follow the handbook directly). On Windows use
+> `python`/`py` and the `.py` tools instead of the `.sh` scripts.
 
 ## 7. Getting started
 
@@ -144,13 +150,19 @@ Markdown (`CLAUDE.md`, `AGENTS.md`, `workflow/`), which any capable agent can fo
    ([`handbook/03`](handbook/03-vscode-and-ai.md)).
 3. **Check your environment:** run `python3 tools/doctor.py` — it lists each tool with
    ✅ / ⚠️ / ❌ and tells you how to fix anything missing.
-4. **Create your first project** — [`handbook/04`](handbook/04-your-first-project.md):
+4. **See a worked example first** — [`projects/example-usb-c-3v3/`](projects/example-usb-c-3v3/)
+   is a complete, real reference board (USB-C → 3.3 V + status LED). Its netlist is
+   machine-checkable:
+   ```
+   python3 -m pcbflow.enet projects/example-usb-c-3v3/04_schematic/netlist.enet
+   ```
+5. **Create your first project** — [`handbook/04`](handbook/04-your-first-project.md):
    ```
    cp -r projects/_template projects/my-board
    ```
    Then tell your AI assistant: *"follow the workflow, start phase 1 for
    projects/my-board — it's a [describe your product]."*
-5. **Work the phases** — generate the schematic, review it, place, route, verify. The AI
+6. **Work the phases** — generate the schematic, review it, place, route, verify. The AI
    runs the repetitive work; you approve the checkpoints.
 
 That's it. From here you talk to the AI in plain English and it walks you through the
@@ -215,4 +227,9 @@ KiCad and an AI assistant, **including the honest record of what went wrong** �
 [`knowledge/learning-db.md`](knowledge/learning-db.md). You inherit the solutions without
 paying the tuition.
 
-License: [MIT](LICENSE).
+**Project files:** [`CHANGELOG.md`](CHANGELOG.md) · [`ROADMAP.md`](ROADMAP.md) ·
+[`CONTRIBUTING.md`](CONTRIBUTING.md) · [`SECURITY.md`](SECURITY.md) ·
+[`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) · [`architecture/`](architecture/README.md).
+
+License: [MIT](LICENSE). Status: **v0.1.0 public Beta** — see
+[`CHANGELOG.md`](CHANGELOG.md) for what's built and the known limitations.

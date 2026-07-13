@@ -23,6 +23,7 @@ looks like · Common mistakes · Checklist · Next step.**
 | 10 | [Manufacturing](10-manufacturing.md) | producing the files and ordering the board |
 | — | [Glossary](glossary.md) | every software term, explained in plain English |
 | 🪟 | [Windows setup](windows-setup.md) | using PCB Flow on Windows (`python`/`py`, the `.py` tools, close Chrome first) |
+| 🍎 | [macOS setup](macos-setup.md) | using PCB Flow on macOS (Homebrew installs, the `.sh` tools work, the EasyEDA Bridge) |
 
 ## Two ideas to hold onto
 
