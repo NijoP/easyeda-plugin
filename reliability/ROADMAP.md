@@ -23,7 +23,11 @@ in what order.
 
 ---
 
-## Phase 1 — See everything (highest value, lowest risk)
+## Phase 1 — See everything (highest value, lowest risk) · ✅ BUILT
+
+> **Implemented** in [`../tools/`](../tools/): `doctor.py` (preflight environment
+> check) + `axon_log.py` (structured `{ok,err}` logging) + a passing test. Run
+> `python3 tools/doctor.py`. See [`../tools/README.md`](../tools/README.md).
 
 Build the two things that turn *invisible* failures into *handled* ones:
 

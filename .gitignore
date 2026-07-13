@@ -13,6 +13,11 @@ manufacturing/
 my-board/
 boards/*/build/
 
+# Runtime logs (per-project structured logs — regenerated, not source)
+**/.logs/
+__pycache__/
+*.pyc
+
 # OS / editor
 .DS_Store
 Thumbs.db

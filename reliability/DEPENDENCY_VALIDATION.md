@@ -5,8 +5,8 @@ work starts**, which verifies the whole environment, explains any problem in pla
 English, and refuses to start if something critical is missing. This closes every
 `ENV-*` and most `BR-*` first-run failures.
 
-> **Status: designed, not built.** This is the Phase-1 item in
-> [`ROADMAP.md`](ROADMAP.md). The check table below is the spec.
+> **Status: ✅ built** — implemented as [`../tools/doctor.py`](../tools/doctor.py).
+> Run `python3 tools/doctor.py`. The check table below is the spec it implements.
 
 ---
 

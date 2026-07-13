@@ -54,8 +54,22 @@ You rarely type Git commands — the AI does it for you — but it must be insta
 > [glossary](glossary.md). You don't need to master them — just have the tools
 > installed.
 
+## Final check — run the doctor
+
+AXON includes a one-command check that confirms everything above at once. In VS
+Code's terminal, from the AXON folder:
+
+```
+python3 tools/doctor.py
+```
+
+It lists each tool with ✅ / ⚠️ / ❌ and tells you exactly how to fix anything
+missing. All green (or only ⚠️ notes for tools you don't need yet, like KiCad) means
+you're ready to start.
+
 ## What good looks like
 
+- `python3 tools/doctor.py` shows no ❌ items.
 - VS Code opens.
 - Your AI assistant appears inside VS Code and you can type a message to it.
 - EasyEDA Pro and KiCad both open.
