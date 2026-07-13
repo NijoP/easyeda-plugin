@@ -16,10 +16,11 @@ internal reliability build plan lives in
 - **Engineering knowledge base** — first principles, a heuristics graph, hard design
   standards (IPC widths, via ampacity, DFM floor), and an append-only learning log that
   compounds across projects.
-- **Reliability & self-healing (Phases 1–5, built + tested)** — a preflight environment
-  `doctor`, structured logging, automatic fault diagnosis, safe retry, a self-healing
-  recovery engine with plain-English errors, checkpoint/resume, a phantom-DRC guard, and
-  cross-platform tooling.
+- **Reliability layer (built + unit-tested)** — a preflight environment `doctor`, automatic
+  fault diagnosis, safe retry, a phantom-DRC guard, checkpoint/resume, and cross-platform
+  tooling. Structured logging and the self-healing recovery engine are implemented and
+  unit-tested but **opt-in** — not yet wired into every phase, and the live browser/KiCad
+  recovery strategies still need real-session validation (see below).
 - **Engineer handbook** — a 12-step onboarding path plus a glossary, written for
   electronics engineers with no software background.
 

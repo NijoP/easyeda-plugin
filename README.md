@@ -93,7 +93,7 @@ Full detail per phase: [`workflow/`](workflow/) and the [handbook](handbook/READ
 | [`knowledge/`](knowledge/) | The engineering rules and lessons the AI follows (IPC widths, design standards, learnings). |
 | [`templates/`](templates/) | Blank forms you fill in for a new board (parts list, net list, rules). |
 | [`projects/`](projects/) | **Your boards live here** — one folder per project, with all its files and outputs. |
-| [`tools/`](tools/) | Reliability helpers: the environment check (`doctor`), logging, and self-healing recovery. |
+| [`tools/`](tools/) | Reliability helpers: the environment check (`doctor`), logging, and recovery (opt-in). |
 | [`reliability/`](reliability/) | How the workspace detects and recovers from problems + the [troubleshooting guide](reliability/TROUBLESHOOTING.md). |
 | [`architecture/`](architecture/) | **Architecture audit & target design** — learnings from EasyEDA/KiCad, the tool-agnostic architecture, and the implementation roadmap. |
 | [`docs/`](docs/) | Deep reference material. *Optional — for later, or for contributors.* |
@@ -137,7 +137,8 @@ Markdown (`CLAUDE.md`, `AGENTS.md`, `workflow/`), which any capable agent can fo
 > **Bridge** — install the `run-api-gateway` extension in EasyEDA Pro, tick *"allow external
 > interaction"*, and run the bridge server (needs Node.js). Setup:
 > [`automation/easyeda/README.md`](automation/easyeda/README.md). A raw Chrome-DevTools
-> fallback (`tools/launch_easyeda.py`) is used automatically if the Bridge isn't running.
+> fallback (the CDP driver `automation/browser/cdp.py`, with `tools/launch_easyeda.py`
+> launching a logged-in Chrome) is used automatically if the Bridge isn't running.
 
 > 🖥️ **Platform setup:** **[Windows](handbook/windows-setup.md)** ·
 > **[macOS](handbook/macos-setup.md)** · Linux (follow the handbook directly). On Windows use
@@ -151,8 +152,10 @@ Markdown (`CLAUDE.md`, `AGENTS.md`, `workflow/`), which any capable agent can fo
 3. **Check your environment:** run `python3 tools/doctor.py` — it lists each tool with
    ✅ / ⚠️ / ❌ and tells you how to fix anything missing.
 4. **See a worked example first** — [`projects/example-usb-c-3v3/`](projects/example-usb-c-3v3/)
-   is a complete, real reference board (USB-C → 3.3 V + status LED). Its netlist is
-   machine-checkable:
+   is a worked reference (USB-C → 3.3 V + status LED). Today it's the **front half** of the
+   workflow — brief → feasibility → BOM → schematic netlist; the end-to-end
+   placement/routing/DRC/gerber build is landing next (see [`ROADMAP.md`](ROADMAP.md)). Its
+   netlist is machine-checkable:
    ```
    python3 -m pcbflow.enet projects/example-usb-c-3v3/04_schematic/netlist.enet
    ```
@@ -171,9 +174,10 @@ rest.
 ## 8. Roadmap
 
 - **✅ Built now:** the 12-phase workflow, the AI agent roster, EasyEDA + KiCad
-  automation, the engineering knowledge base, and a complete self-healing reliability
-  layer (environment check, logging, auto-diagnosis, retry, recovery, resume,
-  cross-platform tools).
+  automation, the engineering knowledge base, and a reliability layer (environment check,
+  auto-diagnosis, safe retry, phantom-DRC guard, checkpoint/resume, cross-platform tools).
+  Structured logging and the self-healing recovery engine are built and unit-tested but
+  **opt-in** — not yet wired into every phase (see [`AUDIT.md`](AUDIT.md)).
 - **🚧 In progress:** live-session validation of the recovery strategies; macOS/Windows
   validation; a public end-to-end example project.
 - **🔭 Planned:** a branded CLI, a source-of-truth linter, deeper KiCad routing
@@ -204,8 +208,8 @@ Full detail: [`ROADMAP.md`](ROADMAP.md).
   traces; grounds return cleanly. These are enforced in
   [`knowledge/design-standards.md`](knowledge/design-standards.md).
 - **Recommended workflow:** one phase at a time, review each checkpoint, commit your work
-  as you go. The AI's reliability layer auto-recovers common failures and explains the
-  rest in plain English.
+  as you go. The AI's reliability layer diagnoses common failures and walks you through
+  recovery in plain English.
 - **If something breaks:** just tell the AI *"something went wrong — read the log and fix
   it."* See [`reliability/TROUBLESHOOTING.md`](reliability/TROUBLESHOOTING.md).
 

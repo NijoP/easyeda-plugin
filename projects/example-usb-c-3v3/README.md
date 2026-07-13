@@ -1,7 +1,7 @@
 # Example — USB-C → 3.3 V power supply + status LED
 
-A small, complete **worked reference** board that shows what a PCB Flow project looks like
-at each phase. It's deliberately simple (8 parts, 1 layer of logic) so you can read the whole
+A small, self-contained **worked reference** board that shows what a PCB Flow project looks
+like at each phase. It's deliberately simple (8 parts, 1 layer of logic) so you can read the whole
 thing in a few minutes, then copy the *shape* for your own board.
 
 > **This is a learning example, not a template.** To start your own board, copy

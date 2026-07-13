@@ -42,6 +42,23 @@ pcbflow spacing placement.json   # pad-spacing audit on real geometry (exit 1 on
 pcbflow congestion nets.json     # predict where routing will need via-fans
 ```
 
+**Audit (offline checks — the moment you have a netlist, no live tool needed):**
+```bash
+pcbflow enet netlist.enet            # parse + structural verify of an EasyEDA .enet
+pcbflow erc  netlist.enet            # electrical rule check (floating pins, ground, decoupling)
+pcbflow dfm  board.json              # DRC/DFM vs the JLCPCB profile
+pcbflow verify netlist.enet --board board.json   # phase-5 audit: structure + ERC (+ DFM)
+pcbflow import-check netlist.enet board.kicad_pcb # phase-10: does the KiCad board match the netlist?
+pcbflow erc  netlist.enet --json     # harmonized findings as JSON (also on dfm/verify/import-check)
+```
+`import-check` reads the `.kicad_pcb` directly (no KiCad running, `pcbflow/kicad_sexp.py`) and
+**fails loudly** if a component or named net drifted during the EasyEDA→KiCad import — so a
+layout is never built on a corrupted netlist.
+Every check emits the **harmonized finding schema** (`pcbflow/findings.py`): each finding
+carries a stable id, detector, rule_id, severity, **confidence**, **evidence_source**,
+components/nets, recommendation, and provenance — so reports are git-diffable and each claim
+carries its own evidence. `--json` output is deterministic and schema-validated.
+
 **Tools (delegates to the automation):**
 ```bash
 pcbflow doctor                 # check the environment
@@ -57,6 +74,9 @@ pcbflow drc board.kicad_pcb rules.kicad_pro   # KiCad DRC (phantom-guard)
 |---|---|
 | Phase order + gating | `pcbflow/phases.py`, `pcbflow/project.py` |
 | IPC-2221 solver | `pcbflow/ipc.py` |
+| Offline checks (ERC / DFM / spacing) | `pcbflow/erc.py`, `pcbflow/dfm.py`, `pcbflow/geometry.py` |
+| KiCad file reader + import diff | `pcbflow/kicad_sexp.py`, `pcbflow/import_diff.py` |
+| Harmonized finding schema | `pcbflow/findings.py` |
 | CLI dispatch | `pcbflow/cli.py` |
 | Reliability (logging, diagnose, retry, heal) | `tools/` (used by the workflow) |
 | EDA automation | `automation/` (driven by `pcbflow dump`/`recon`/`drc`/`launch`) |

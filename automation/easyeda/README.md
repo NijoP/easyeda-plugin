@@ -1,7 +1,8 @@
 # automation/easyeda/ — Schematic + Placement Engine
 
-The board-agnostic engine that drives EasyEDA Pro's Standalone-Script API. Used in
-phases 3 (init), 4 (schematic generation), and 9 (placement).
+The board-agnostic engine that drives EasyEDA Pro's Standalone-Script API. Driven by the
+schematic-generator and placement-planner agents during phases 3 (init), 4 (schematic
+generation), and 9 (placement).
 
 ## Transport — how JS reaches the editor
 

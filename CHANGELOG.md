@@ -7,6 +7,29 @@ All notable changes to PCB Flow are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- **Offline KiCad S-expression reader** (`pcbflow/kicad_sexp.py`, WS4) — zero-dependency parser
+  that reads a saved `.kicad_pcb` / `.kicad_sch` directly (no running KiCad, no pcbnew) and
+  extracts the post-layout netlist. Handles all three pad-net encodings KiCad emits
+  (`(net id "name")`, id-only via the net table, and name-only) — a bug found and fixed by
+  validating against real boards, not just a hand-written fixture.
+- **Import diff** (`pcbflow/import_diff.py`) + **`pcbflow import-check`** — verifies the
+  EasyEDA→KiCad hand-off (phase 10): compares the `.enet` netlist against the netlist read
+  back from the `.kicad_pcb` and **fails loudly** on a dropped component or a named-net
+  connectivity mismatch, so a layout is never built on a corrupted import.
+- **Harmonized finding schema** (`pcbflow/findings.py`, WS2) — one traceable record for every
+  check: stable sha256 id, detector, rule_id, category, severity, **confidence**
+  (deterministic/heuristic/datasheet-backed), **evidence_source**, components/nets,
+  recommendation, and provenance. Ships `sort_findings` (deterministic), `report` (pass/fail
+  rollup), `trust_summary` (confidence/evidence mix → level), and deterministic `to_json` /
+  `to_markdown` emitters.
+- **`--json` output** on `pcbflow erc` / `dfm` / `verify` / `import-check` — deterministic,
+  schema-validated harmonized findings for machine consumption.
+
+### Changed
+- **External-tool call hardening (WS4)** — `tools/drc.py` now bounds `kicad-cli` with a timeout
+  and returns a documented manual-fallback command on timeout; `cdp.py` bounds the browser
+  connect with `open_timeout`; `EdaSession._detect` no longer swallows a Bridge-discovery
+  failure silently — it logs why it fell back to CDP.
 - **ERC engine** (`pcbflow/erc.py`) — offline electrical rule check on an `.enet` netlist:
   floating pins, dangling (single-pin) nets, missing ground, and power rails without
   decoupling. Runs the moment you have a netlist — no live tool needed.
@@ -14,6 +37,18 @@ All notable changes to PCB Flow are documented here. Format follows
   `erc` (electrical rule check), `dfm` (DRC/DFM vs the JLCPCB profile), and **`verify`** — the
   offline phase-5 audit (structure + ERC, plus DFM when a board-features JSON is given) with a
   single PASS/FAIL verdict.
+
+### Changed
+- **Docs truthing (WS0)** — corrected two overstated claims to match the code: the worked
+  example is now described as the **front half** of the workflow (end-to-end build landing
+  next), and the "complete self-healing reliability layer" as a reliability layer whose
+  structured logging + self-healing recovery engine are built/unit-tested but **opt-in** (not
+  yet wired into every phase). Also fixed the CDP-fallback path in the README (`automation/
+  browser/cdp.py`) and the phase-usage note in `automation/easyeda/README.md`.
+
+### Added
+- Production-hardening initiative docs: `AUDIT.md` (claims-vs-evidence + tech-debt) and
+  `IMPROVEMENT_PLAN.md` (ordered workstreams to the 10/10 bar).
 
 ## [0.1.0-beta] — 2026-07-13
 
