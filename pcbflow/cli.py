@@ -7,11 +7,12 @@ doctor, launch, dump, recon, drc.
 Run from the cloned repo (the pass-throughs resolve tool paths relative to it).
 """
 import argparse
+import json
 import subprocess
 import sys
 from pathlib import Path
 
-from . import __version__, ipc, phases
+from . import __version__, congestion, geometry, ipc, phases, routing
 from .project import Project
 
 REPO = Path(__file__).resolve().parent.parent
@@ -108,6 +109,47 @@ def cmd_ipc(a):
     return 0
 
 
+def cmd_widths(a):
+    nets = json.loads(Path(a.nets).read_text())
+    table = routing.trace_width_table(nets, delta_t_c=a.delta_t)
+    for row in table:
+        print(f"{row['net']:<16} {row['i_peak_a']:>6} A  {row['width_mm']:>7} mm  [{row['method']}]")
+    if a.out:
+        Path(a.out).write_text(json.dumps(table, indent=2))
+        print(f"-> {a.out}")
+    return 0
+
+
+def cmd_stitch_pitch(a):
+    print(f"edge knee: {routing.edge_knee_mhz(a.t_rise)} MHz  ->  "
+          f"λ/20 stitch pitch: {routing.stitch_pitch_mm(a.t_rise, a.er)} mm")
+    return 0
+
+
+def cmd_spacing(a):
+    doc = json.loads(Path(a.placement).read_text())
+    v = geometry.spacing_audit(doc["parts"], min_gap=doc.get("min_gap", 0.5),
+                               whitelist=doc.get("whitelist", []))
+    if not v:
+        print("spacing: 0 violations (real geometry).")
+        return 0
+    print(f"spacing: {len(v)} violation(s):")
+    for x in v:
+        print(f"  {x['a']} <-> {x['b']}: gap {x['gap']} mm < {x['limit']} mm")
+    return 1
+
+
+def cmd_congestion(a):
+    doc = json.loads(Path(a.input).read_text())
+    g = congestion.grid(doc["nets"], doc["w"], doc["h"], bin_mm=doc.get("bin_mm", 2.0))
+    hot = congestion.saturated(g)
+    print(f"congestion: {g['nx']}x{g['ny']} bins @ {g['bin_mm']}mm; "
+          f"{len(hot)} saturated bin(s) need a via-fan to the other layer")
+    for h in hot[:20]:
+        print(f"  bin {h['bin']}: demand {h['demand']} > cap {h['cap']}")
+    return 0
+
+
 def build_parser():
     ap = argparse.ArgumentParser(prog="pcbflow", description="AI-assisted PCB design harness")
     ap.add_argument("--version", action="version", version=f"pcbflow {__version__}")
@@ -149,6 +191,21 @@ def build_parser():
 
     dr = sub.add_parser("drc", help="run KiCad DRC (guarded against phantom-clean)")
     dr.add_argument("board"); dr.add_argument("ruleset", nargs="?"); dr.set_defaults(fn=cmd_drc)
+
+    wd = sub.add_parser("widths", help="IPC-2221 trace-width table from a nets JSON")
+    wd.add_argument("nets"); wd.add_argument("out", nargs="?")
+    wd.add_argument("--delta-t", dest="delta_t", type=float, default=10.0)
+    wd.set_defaults(fn=cmd_widths)
+
+    sp = sub.add_parser("stitch-pitch", help="λ/20 ground-stitch pitch from an edge rise time (ns)")
+    sp.add_argument("t_rise", type=float); sp.add_argument("--er", type=float, default=4.3)
+    sp.set_defaults(fn=cmd_stitch_pitch)
+
+    sc = sub.add_parser("spacing", help="placement spacing audit from a placement JSON")
+    sc.add_argument("placement"); sc.set_defaults(fn=cmd_spacing)
+
+    cg = sub.add_parser("congestion", help="routing congestion prediction from a nets JSON")
+    cg.add_argument("input"); cg.set_defaults(fn=cmd_congestion)
 
     return ap
 

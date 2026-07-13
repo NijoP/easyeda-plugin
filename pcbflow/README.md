@@ -34,6 +34,14 @@ pcbflow ipc 2 --oz 2           # 2 A on 2 oz copper
 pcbflow ipc 3 --internal       # inner-layer (0.5 oz) derating
 ```
 
+**Placement & routing planning:**
+```bash
+pcbflow widths nets.json         # IPC-2221 trace-width table (net -> width / plane)
+pcbflow stitch-pitch 0.7         # λ/20 ground-stitch pitch from an edge rise time (ns)
+pcbflow spacing placement.json   # pad-spacing audit on real geometry (exit 1 on violations)
+pcbflow congestion nets.json     # predict where routing will need via-fans
+```
+
 **Tools (delegates to the automation):**
 ```bash
 pcbflow doctor                 # check the environment
