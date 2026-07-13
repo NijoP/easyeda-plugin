@@ -29,9 +29,14 @@ AI assistant — those phases produce geometry, which this text repo intentional
 The netlist here is real — the shipped Python tools read it directly:
 
 ```bash
-# Parse + structurally verify the netlist (0 issues expected)
-python3 -m pcbflow.enet projects/example-usb-c-3v3/04_schematic/netlist.enet
-#   → 8 components, 6 nets, 0 floating pins, 6 BOM lines, verify_issues: []
+# The full offline phase-5 audit: netlist structure + ERC (electrical rule check)
+python3 -m pcbflow.cli verify projects/example-usb-c-3v3/04_schematic/netlist.enet
+#   → netlist structure: clean · ERC: 0 error / 0 warning · VERDICT: PASS
+
+# Or the pieces individually:
+python3 -m pcbflow.cli enet <netlist.enet>   # parse + structural verify
+python3 -m pcbflow.cli erc  <netlist.enet>   # electrical rule check
+python3 -m pcbflow.cli dfm  <board.json>     # DRC/DFM against the JLCPCB profile
 ```
 
 ```python

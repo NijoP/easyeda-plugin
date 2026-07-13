@@ -12,7 +12,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from . import __version__, congestion, geometry, ipc, phases, routing
+from . import __version__, congestion, dfm, enet as enet_mod, erc, geometry, ipc, phases, routing
 from .project import Project
 
 REPO = Path(__file__).resolve().parent.parent
@@ -150,6 +150,67 @@ def cmd_congestion(a):
     return 0
 
 
+def _print_violations(items):
+    for v in items:
+        print(f"  [{v['severity']:<7}] {v['rule']:<20} {v.get('where','')}: {v['reason']}")
+
+
+def cmd_enet(a):
+    net = enet_mod.Enet.load(a.file)
+    issues = net.verify()
+    print(json.dumps({"stats": net.stats(), "verify_issues": issues}, indent=2))
+    return 0 if not issues else 1
+
+
+def cmd_erc(a):
+    net = enet_mod.Enet.load(a.file)
+    v = erc.run_erc(net)
+    rep = erc.report(v)
+    print(f"ERC {net.stats()['components']} comps: {rep['errors']} error(s), {rep['warnings']} warning(s)"
+          f"  -> {'PASS' if rep['pass'] else 'FAIL'}")
+    _print_violations(v)
+    return 0 if rep["pass"] else 1
+
+
+def cmd_dfm(a):
+    design = json.loads(Path(a.design).read_text())
+    board = design.get("board", {})
+    rs = dfm.RuleSet.jlcpcb(layers=a.layers or board.get("layers", 2),
+                            copper_oz=a.copper or board.get("copper_oz", "1oz"))
+    v = dfm.run_dfm(design, rs)
+    rep = dfm.report(v)
+    print(f"DFM [{rs.name}]: {rep['errors']} error(s), {rep['warnings']} warning(s)"
+          f"  -> {'PASS' if rep['pass'] else 'FAIL'}")
+    _print_violations(v)
+    return 0 if rep["pass"] else 1
+
+
+def cmd_verify(a):
+    """Offline phase-5 audit: structural netlist verify + ERC (+ DFM if a board is given)."""
+    net = enet_mod.Enet.load(a.file)
+    struct = net.verify()
+    ev = erc.run_erc(net)
+    erep = erc.report(ev)
+    print(f"== verify {a.file} ==")
+    print(f"  netlist structure : {'clean' if not struct else str(len(struct)) + ' issue(s)'}")
+    for s in struct:
+        print(f"    - {s}")
+    print(f"  ERC               : {erep['errors']} error(s), {erep['warnings']} warning(s)")
+    _print_violations(ev)
+    ok = not struct and erep["pass"]
+    if a.board:
+        design = json.loads(Path(a.board).read_text())
+        b = design.get("board", {})
+        rs = dfm.RuleSet.jlcpcb(layers=b.get("layers", 2), copper_oz=b.get("copper_oz", "1oz"))
+        dv = dfm.run_dfm(design, rs)
+        drep = dfm.report(dv)
+        print(f"  DFM [{rs.name}]      : {drep['errors']} error(s), {drep['warnings']} warning(s)")
+        _print_violations(dv)
+        ok = ok and drep["pass"]
+    print(f"  VERDICT           : {'PASS' if ok else 'FAIL'}")
+    return 0 if ok else 1
+
+
 def build_parser():
     ap = argparse.ArgumentParser(prog="pcbflow", description="AI-assisted PCB design harness")
     ap.add_argument("--version", action="version", version=f"pcbflow {__version__}")
@@ -206,6 +267,23 @@ def build_parser():
 
     cg = sub.add_parser("congestion", help="routing congestion prediction from a nets JSON")
     cg.add_argument("input"); cg.set_defaults(fn=cmd_congestion)
+
+    en = sub.add_parser("enet", help="parse + structurally verify an .enet netlist")
+    en.add_argument("file"); en.set_defaults(fn=cmd_enet)
+
+    er = sub.add_parser("erc", help="electrical rule check on an .enet netlist")
+    er.add_argument("file"); er.set_defaults(fn=cmd_erc)
+
+    df = sub.add_parser("dfm", help="DRC/DFM check on a board-features JSON (JLCPCB profile)")
+    df.add_argument("design")
+    df.add_argument("--layers", type=int, default=None)
+    df.add_argument("--copper", default=None)
+    df.set_defaults(fn=cmd_dfm)
+
+    vf = sub.add_parser("verify", help="offline phase-5 audit: netlist verify + ERC (+ DFM)")
+    vf.add_argument("file", help="the .enet netlist")
+    vf.add_argument("--board", default=None, help="optional board-features JSON for DFM")
+    vf.set_defaults(fn=cmd_verify)
 
     return ap
 

@@ -6,6 +6,15 @@ All notable changes to PCB Flow are documented here. Format follows
 
 ## [Unreleased]
 
+### Added
+- **ERC engine** (`pcbflow/erc.py`) — offline electrical rule check on an `.enet` netlist:
+  floating pins, dangling (single-pin) nets, missing ground, and power rails without
+  decoupling. Runs the moment you have a netlist — no live tool needed.
+- **CLI commands** wiring the netlist/rules tooling into `pcbflow`: `enet` (parse + verify),
+  `erc` (electrical rule check), `dfm` (DRC/DFM vs the JLCPCB profile), and **`verify`** — the
+  offline phase-5 audit (structure + ERC, plus DFM when a board-features JSON is given) with a
+  single PASS/FAIL verdict.
+
 ## [0.1.0-beta] — 2026-07-13
 
 First public **Beta**. An AI-assisted electronics engineering workspace that takes a board
