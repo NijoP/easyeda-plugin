@@ -13,9 +13,11 @@ dependencies = ["websockets>=10"]   # only used by the headless EasyEDA driver (
 
 [project.optional-dependencies]
 dev = ["pytest>=7"]
+mcp = ["mcp>=1.2"]
 
 [project.scripts]
 pcbflow = "pcbflow.cli:main"
+pcbflow-mcp = "pcbflow.mcp_server:main"
 
 [tool.setuptools]
 packages = ["pcbflow"]
