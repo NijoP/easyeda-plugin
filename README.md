@@ -124,6 +124,7 @@ one is confirmed correct. Full walkthrough:
 | [`templates/`](templates/) | Blank forms you fill in for a new board (parts list, net list, rules). |
 | [`projects/`](projects/) | **Your boards live here** — one folder per project, with all its files and outputs. |
 | [`docs/`](docs/) | Deep reference material. *Optional — for later, or for contributors.* |
+| [`reliability/`](reliability/) | How the workspace detects & recovers from problems, plus the [troubleshooting guide](reliability/TROUBLESHOOTING.md). |
 | Root files (`CLAUDE.md`, `AGENTS.md`) | Instruction sheets the **AI** reads. You don't need to. |
 
 ---
