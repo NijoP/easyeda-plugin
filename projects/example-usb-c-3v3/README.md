@@ -11,7 +11,7 @@ thing in a few minutes, then copy the *shape* for your own board.
 Takes 5 V from **USB-C**, regulates it to **3.3 V** with an LDO, and lights a **status LED**.
 CC pins have the mandatory 5.1 kΩ pull-downs so a USB-C source actually supplies VBUS.
 
-## What's in here (front-half of the workflow, filled in)
+## What's in here (the full workflow — end to end)
 | Phase | File | Shows |
 |---|---|---|
 | — | [`project.yaml`](project.yaml) | the decision/state manifest (never file paths) |
@@ -22,8 +22,11 @@ CC pins have the mandatory 5.1 kΩ pull-downs so a USB-C source actually supplie
 | 3–4 | [`04_schematic/netlist.enet`](04_schematic/netlist.enet) | the **machine-checkable** netlist (EasyEDA `.enet` v2.0.0) |
 | 10 | [`11_routing/design_rules.json`](11_routing/design_rules.json) | the JLCPCB DRC/DFM ruleset for this board |
 
-Placement (8–9), routing (11), and verification (12) happen **live** in EasyEDA/KiCad with your
-AI assistant — those phases produce geometry, which this text repo intentionally doesn't vendor.
+The schematic capture (EasyEDA, phases 3–4) and interactive placement are the **live front-end**
+step. Everything downstream is **generated and committed**: the routed **KiCad board**
+(`10_kicad_export/board.kicad_pcb`, from `tools/gen_example_board.py`), the **import diff**
+proving the board matches the netlist, a `kicad-cli` **DRC-clean** report, exported **gerbers**,
+and the **BOM** — all reproducible with one command (see below).
 
 ## Try the tooling against it
 The netlist here is real — the shipped Python tools read it directly:
@@ -46,6 +49,18 @@ ix = Enet.load("projects/example-usb-c-3v3/04_schematic/netlist.enet").design_in
 print(ix.net("+3V3"))          # who is on the 3V3 rail, its net class, pin count
 print(ix.component("U1"))      # the LDO's nets + neighbours
 ```
+
+## Reproduce it end-to-end
+One command regenerates the board, runs every offline check, writes the phase reports, and
+exports gerbers — ending in a `kicad-cli` **DRC-clean** board:
+
+```bash
+make example          # or: python3 tools/reproduce_example.py
+```
+It prints a per-step PASS/FAIL table and writes the reports into the phase folders
+(`05_schematic_audit/`, `10_kicad_export/`, `12_verification/`). The DRC + gerber steps need
+`kicad-cli` (KiCad); without it the netlist / ERC / import-diff checks still run. A reviewer
+verifies the whole chain in a few minutes.
 
 ## How to use it as a reference
 Read `brief → feasibility → bom → net_connection` in order — that's the discipline PCB Flow

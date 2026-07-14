@@ -35,3 +35,6 @@ npm-debug.log*
 *credentials*
 .coverage
 htmlcov/
+
+# KiCad local per-user settings sidecar (not source)
+*.kicad_prl
