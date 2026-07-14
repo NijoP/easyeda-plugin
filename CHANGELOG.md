@@ -7,6 +7,15 @@ All notable changes to PCB Flow are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- **Hardware Tier 2 — integrity checks** (`pcbflow hw --board`) — real physics on the routed board:
+  - **signal integrity** (`pcbflow/si.py`): IPC-2141 microstrip impedance + differential-pair skew
+    and equal-length matching — consuming the `.enet` `differentialPair`/`equalLengthNetGroup`/
+    `netClass` intent that nothing read before.
+  - **power distribution** (`pcbflow/pdn.py`): IR drop `V=I·R` (R=ρL/wt) vs a rail budget, and via
+    ampacity (IPC-2221 barrel-wall law) vs the net current.
+  - **thermal** (`pcbflow/thermal.py`): `Tj = Ta + P·θJA`, with LDO power `(Vin−Vout)·Iout`.
+  - Enabled by extending `pcbflow/kicad_sexp.py` to read **track/via geometry** (per-net length,
+    width, layer) — validated on the real example board.
 - **Hardware Tier 1 — electrical-correctness checks** (`pcbflow hw`) — the first real
   electrical (not just geometric) checks, each emitting harmonized findings:
   - **pin-type ERC** (`pcbflow/erc_pins.py`): driver contention, output-on-power-rail,

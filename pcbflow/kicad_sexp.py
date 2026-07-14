@@ -174,3 +174,48 @@ def read_sch_components(path_or_text):
         if ref and not ref.startswith("#"):        # skip power/graphic pseudo-symbols
             out.append({"ref": ref, "lib_id": lib[1] if lib and len(lib) > 1 else ""})
     return out
+
+
+def _num(node, default=0.0):
+    try:
+        return float(node[1])
+    except (TypeError, ValueError, IndexError):
+        return default
+
+
+def read_pcb_geometry(path_or_text):
+    """Read routed copper from a `.kicad_pcb`: track segments (with width, layer, length) and
+    vias (with size, drill). Net is resolved through the top-level net table (segments/vias carry
+    `(net <id>)`). Returns {"tracks": [...], "vias": [...]} — feeds the Tier-2 SI/PDN checks."""
+    import math
+    root = parse(_load(path_or_text))
+    if _tag(root) != "kicad_pcb":
+        raise ValueError(f"not a .kicad_pcb (top tag is {_tag(root)!r})")
+    nettable = {net[1]: net[2] for net in _children(root, "net") if len(net) >= 3}
+    tracks, vias = [], []
+    for seg in _children(root, "segment"):
+        s, e = _first(seg, "start"), _first(seg, "end")
+        if s and e and len(s) >= 3 and len(e) >= 3:
+            length = math.hypot(float(e[1]) - float(s[1]), float(e[2]) - float(s[2]))
+        else:
+            length = 0.0
+        layer = _first(seg, "layer")
+        tracks.append({"net": _pad_net_name(_first(seg, "net"), nettable),
+                       "width": _num(_first(seg, "width")),
+                       "layer": layer[1] if layer and len(layer) >= 2 else "",
+                       "length": round(length, 4)})
+    for via in _children(root, "via"):
+        at = _first(via, "at")
+        vias.append({"net": _pad_net_name(_first(via, "net"), nettable),
+                     "x": _num(at), "y": (float(at[2]) if at and len(at) >= 3 else 0.0),
+                     "size": _num(_first(via, "size")), "drill": _num(_first(via, "drill"))})
+    return {"tracks": tracks, "vias": vias}
+
+
+def net_lengths(geometry):
+    """net name -> total routed track length (mm), summed over its segments."""
+    out = {}
+    for t in geometry["tracks"]:
+        if t["net"]:
+            out[t["net"]] = out.get(t["net"], 0.0) + t["length"]
+    return {n: round(v, 4) for n, v in out.items()}

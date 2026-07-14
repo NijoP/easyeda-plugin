@@ -291,7 +291,7 @@ def cmd_export(a):
 def cmd_hw(a):
     """Hardware-correctness checks (Tier 1): pin-type ERC, power tree, component ratings.
     Needs a parts.json beside the netlist (electrical types + ratings)."""
-    fs = hw.run(a.netlist)
+    fs = hw.run(a.netlist, board=getattr(a, "board", None))
     if getattr(a, "json", False):
         print(findings.to_json(fs))
         return 0 if findings.report(fs)["pass"] else 1
@@ -398,8 +398,9 @@ def build_parser():
     vf.add_argument("--json", action="store_true", help="emit the full audit as JSON")
     vf.set_defaults(fn=cmd_verify)
 
-    hwp = sub.add_parser("hw", help="hardware checks: pin-type ERC, power tree, component ratings")
+    hwp = sub.add_parser("hw", help="hardware checks: pin-type ERC, power tree, ratings, SI/PDN, thermal")
     hwp.add_argument("netlist", help="the .enet netlist (with a parts.json beside it)")
+    hwp.add_argument("--board", default=None, help="a .kicad_pcb to add SI (impedance/length) + PDN checks")
     hwp.add_argument("--json", action="store_true", help="emit harmonized findings as JSON")
     hwp.set_defaults(fn=cmd_hw)
 

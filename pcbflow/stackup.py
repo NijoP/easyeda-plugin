@@ -33,6 +33,11 @@ class Stackup:
     def signal_layers(self):
         return [ly for ly in self.layers if ly.kind in ("signal", "plane")]
 
+    def copper_thickness(self):
+        """Copper thickness (mm) of the top signal layer — the `t` an impedance formula needs."""
+        sl = self.signal_layers()
+        return copper_thickness_mm(sl[0].copper_oz) if sl else copper_thickness_mm(1.0)
+
     def dielectric_to_reference(self, layer_name):
         """(height_mm, er) from a signal layer down to its nearest reference plane below —
         the geometry a microstrip/stripline impedance formula needs. Falls back to the layer's
