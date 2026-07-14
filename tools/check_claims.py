@@ -15,7 +15,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 DOCS = ["README.md", "VALIDATION.md", "CHANGELOG.md", "ROADMAP.md", "install-guidance.md",
         "llms.txt", "GEMINI.md", "AGENTS.md", "CONTRIBUTING.md", "docs/CONFIG.md",
-        "projects/example-usb-c-3v3/README.md", "pcbflow/README.md"]
+        "projects/example-usb-c-3v3/README.md", "pcbflow/README.md",
+        "docs/HW_GAP_ANALYSIS.md"]
 _LINK = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
 
 

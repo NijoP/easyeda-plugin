@@ -39,6 +39,9 @@ internal reliability build plan lives in
 - A source-of-truth linter (auto-check `build_sheet.md` ↔ `net_connection.md`).
 - Deeper KiCad-native routing automation (pours/zones/stitching scripted end-to-end).
 - More AI-agent adapters and an explicit adapter interface.
+- **Hardware-correctness checks** — electrical ERC (pin types / driver conflicts), component
+  ratings, power-tree integrity, signal + power integrity, thermal, DFA/DFT, and BOM sourcing.
+  Reviewed and scoped as workstreams in [`docs/HW_GAP_ANALYSIS.md`](docs/HW_GAP_ANALYSIS.md).
 
 ## 🧪 Future research
 
