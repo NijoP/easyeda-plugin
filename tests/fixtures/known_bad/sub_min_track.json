@@ -1,0 +1,12 @@
+{
+  "board": {
+    "layers": 2
+  },
+  "tracks": [
+    {
+      "net": "SDA",
+      "width": 0.1,
+      "layer": "F"
+    }
+  ]
+}

@@ -7,6 +7,18 @@ All notable changes to PCB Flow are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- **Worked example is now end-to-end + reproducible in one command** (WS1) — `make example`
+  (`tools/reproduce_example.py`) regenerates the board, runs every offline check, writes the
+  phase reports, and exports gerbers: netlist structure → ERC → **import-check (board matches
+  netlist)** → **`kicad-cli` DRC (0 violations / 0 unconnected)** → 22 gerber/drill files → BOM.
+  The routed board is produced by a documented generator (`tools/gen_example_board.py`) and is
+  the phase-10 deliverable; committed reports under the project's phase folders show real output.
+  Every phase folder is now filled (03/05/06/07/08/09/10/11/12).
+- **Known-bad fixture corpus** (`tests/fixtures/known_bad/`, WS6) — 3 bad schematics + 3 bad
+  boards, each with a `defect_class` and expected gate status; `tests/test_fixtures.py` proves
+  every gate BLOCKS its bad design (status ≠ PASS) and PASSES the clean example, plus a
+  phases↔agents consistency check. Coverage config (`.coveragerc`) + more CLI tests raise the
+  pure-logic coverage to ~89% (MCP servers, which need the optional `mcp` extra, excluded).
 - **Machine-computed phase gates + hard-blocked export** (`pcbflow/gates.py`, WS3) — the 12
   checkpoints become gates that *run* the checks instead of storing an asserted verdict:
   `compute_phase_gate` executes ERC (schematic), DFM/DRC (board), or spacing (placement) and

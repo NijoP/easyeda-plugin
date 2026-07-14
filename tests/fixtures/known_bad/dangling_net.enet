@@ -1,0 +1,56 @@
+{
+  "version": "2.0.0",
+  "components": {
+    "u": {
+      "props": {
+        "Designator": "U1"
+      },
+      "pinInfoMap": {
+        "1": {
+          "number": "1",
+          "name": "1",
+          "net": "SDA"
+        },
+        "2": {
+          "number": "2",
+          "name": "2",
+          "net": "GND"
+        }
+      }
+    },
+    "r": {
+      "props": {
+        "Designator": "R1"
+      },
+      "pinInfoMap": {
+        "1": {
+          "number": "1",
+          "name": "1",
+          "net": "VBUS"
+        },
+        "2": {
+          "number": "2",
+          "name": "2",
+          "net": "GND"
+        }
+      }
+    },
+    "c": {
+      "props": {
+        "Designator": "C1"
+      },
+      "pinInfoMap": {
+        "1": {
+          "number": "1",
+          "name": "1",
+          "net": "VBUS"
+        },
+        "2": {
+          "number": "2",
+          "name": "2",
+          "net": "GND"
+        }
+      }
+    }
+  }
+}

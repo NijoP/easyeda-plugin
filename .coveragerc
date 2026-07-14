@@ -1,0 +1,14 @@
+# Coverage config. The two MCP servers require the optional `mcp` package (pip install
+# .[mcp]); they are integration surfaces, not pure logic, so they're excluded from the
+# core coverage gate and covered separately when the extra is installed. See VALIDATION.md.
+[run]
+source = pcbflow
+omit =
+    pcbflow/mcp_server.py
+    pcbflow/munch_server.py
+    pcbflow/__main__.py
+
+[report]
+exclude_lines =
+    if __name__ == .__main__.:
+    raise NotImplementedError

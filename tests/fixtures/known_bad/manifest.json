@@ -1,0 +1,37 @@
+{
+  "note": "Known-BAD fixtures: each MUST be blocked by the named gate (status != PASS) with the exact expected status. Proves gates block bad designs, not just pass good ones. The clean design is projects/example-usb-c-3v3.",
+  "schematic": {
+    "floating_pin.enet": {
+      "gate": "schematic",
+      "expected": "FAIL",
+      "defect_class": "floating_pin"
+    },
+    "no_ground.enet": {
+      "gate": "schematic",
+      "expected": "FAIL",
+      "defect_class": "missing_ground"
+    },
+    "dangling_net.enet": {
+      "gate": "schematic",
+      "expected": "WARN",
+      "defect_class": "dangling_net"
+    }
+  },
+  "dfm": {
+    "sub_min_track.json": {
+      "gate": "dfm",
+      "expected": "FAIL",
+      "defect_class": "track_too_thin"
+    },
+    "hole_to_hole.json": {
+      "gate": "dfm",
+      "expected": "FAIL",
+      "defect_class": "holes_too_close"
+    },
+    "via_too_small.json": {
+      "gate": "dfm",
+      "expected": "FAIL",
+      "defect_class": "via_too_small"
+    }
+  }
+}
