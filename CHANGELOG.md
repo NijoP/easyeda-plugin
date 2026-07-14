@@ -7,6 +7,13 @@ All notable changes to PCB Flow are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- **Hard, machine-enforced routing gate** (G1) — the routing phase is not "done" until ALL pass:
+  **ERC 0**, **DRC 0** (`kicad-cli` + project ruleset), **DFM** (JLCPCB), **silkscreen 0
+  over-pad/via** (new `pcbflow/silk_check.py`), and **every high-current net on a pour**
+  (`route-check`). `gates._routing_outcomes` folds these into `compute_phase_gate` (phases 11–12)
+  **and** the `export` hard-block — no fab files release until all gates pass AND a human approves
+  (checkpoint #2). New `pcbflow route-check` verb; the new checks run in CI (README §8 documents
+  the full placement→routing pipeline and its two human checkpoints).
 - **Routing checks against the board** (R2) — `pcbflow/routing_check.py` enforces the rulebook on
   the routed `.kicad_pcb`: **pour required** (a net ≥ the pour threshold on traces, not a filled
   pour → error), **trace under-width** (min track width < the IPC-2152 width its current needs →

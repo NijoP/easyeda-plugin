@@ -41,4 +41,10 @@ jobs:
       # runner, so DRC/gerber steps report `skip` — those are verified locally and the
       # committed drc.rpt shows 0 violations). See VALIDATION.md.
       - run: python tools/reproduce_example.py --check
+      - name: Placement plan (P1)
+        run: python -m pcbflow.cli place-plan projects/example-usb-c-3v3/04_schematic/netlist.enet --out /tmp/plan.json --svg /tmp/map.svg
+      - name: Routing rulebook + silk (R2/G1)
+        run: python -m pcbflow.cli route-check projects/example-usb-c-3v3/04_schematic/netlist.enet projects/example-usb-c-3v3/10_kicad_export/board.kicad_pcb
+      - name: Hardware checks (T1-T4)
+        run: python -m pcbflow.cli hw projects/example-usb-c-3v3/04_schematic/netlist.enet --board projects/example-usb-c-3v3/10_kicad_export/board.kicad_pcb
       - run: python tools/doctor.py || true   # smoke: doctor runs and reports

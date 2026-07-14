@@ -111,6 +111,24 @@ def _find(project_dir, pattern):
     return hits[0] if hits else None
 
 
+def _routing_outcomes(project_dir, drc_runner=None):
+    """The routing quality suite (G1): DRC + silkscreen-over-pad + rulebook (pour/width/length/
+    return-path). Returns [] when there is no board."""
+    board = _find(project_dir, "*.kicad_pcb")
+    if not board:
+        return []
+    from . import routing_check, routing_rules, silk_check
+    from .enet import Enet
+    outs = [gate_drc(board, drc_runner),
+            _from_findings("silk", silk_check.run(str(board)))]
+    enet = _find(project_dir, "*.enet")
+    if enet:
+        outs.append(_from_findings("routing",
+                                   routing_check.run(Enet.load(str(enet)), str(board),
+                                                     routing_rules.RoutingRules.beside(str(enet)))))
+    return outs
+
+
 def project_gate(project_dir, drc_runner=None):
     """Run every gate whose artifact is present in the project. Returns a list of GateOutcome.
     A missing netlist is EMPTY (not silently skipped) — export must not clear an unverifiable board."""
@@ -124,9 +142,7 @@ def project_gate(project_dir, drc_runner=None):
     bf = _find(project_dir, "board_features*.json")
     if bf:
         outcomes.append(gate_dfm(bf))
-    board = _find(project_dir, "*.kicad_pcb")
-    if board:
-        outcomes.append(gate_drc(board, drc_runner))
+    outcomes += _routing_outcomes(project_dir, drc_runner)   # DRC + silk + routing rules (G1)
     return outcomes
 
 
@@ -143,12 +159,14 @@ def compute_phase_gate(project_dir, phase, drc_runner=None):
         return gate_placement(place) if place else \
             GateOutcome("placement", "EMPTY", "no placement*.json found", [])
     if phase in (11, 12):
-        board = _find(project_dir, "*.kicad_pcb")
-        if board:
-            return gate_drc(board, drc_runner)
+        outs = _routing_outcomes(project_dir, drc_runner)
         bf = _find(project_dir, "board_features*.json")
         if bf:
-            return gate_dfm(bf)
+            outs.append(gate_dfm(bf))
+        if outs:
+            return GateOutcome("routing", combine(outs),
+                               "; ".join(f"{o.name}:{o.status}" for o in outs),
+                               [d for o in outs for d in o.details])
         return GateOutcome("manufacturability", "EMPTY", "no board (.kicad_pcb / board_features*.json)", [])
     return GateOutcome(f"phase{phase}", "EMPTY", "no computed gate for this phase — record manually", [])
 

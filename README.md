@@ -174,7 +174,43 @@ Markdown (`CLAUDE.md`, `AGENTS.md`, `workflow/`), which any capable agent can fo
 That's it. From here you talk to the AI in plain English and it walks you through the
 rest.
 
-## 8. Roadmap
+## 8. Placement → routing pipeline (codified rules, not vibes)
+
+Placement and routing are driven by **codified rules with two human checkpoints** — copper is
+never drawn or ordered without you.
+
+**Placement — planned, then executed (EasyEDA).** `pcbflow place-plan` optimizes positions to
+**minimize trace length** (HPWL), snaps decoupling caps to their IC, pins connectors to their
+board edge, and renders a **visual map (SVG) you approve before anything is placed** (checkpoint
+#1). The placement gate scores decap proximity (≤ 2 mm ok / 2–4 mm warn / > 4 mm fail),
+connectors-on-edge, courtyard spacing, and keep-outs.
+```bash
+pcbflow place-plan netlist.enet --intent placement_intent.json --out plan.json --svg map.svg
+```
+
+**The routing rulebook (`routing_rules.json`).** The routing phase loads a rulebook every rule of
+which **cites its source** (IPC-2152 / IPC-2221 §6 / JLCPCB). Trace widths are **derived from
+current via IPC-2152** (JLCPCB 1 oz outer / 0.5 oz inner, ΔT = 10 °C default, per-project
+override). **High-current nets (≥ 2.0 A or width > 1.0 mm) must be polygon pours**, not traces.
+EMI rules cover return-path continuity and no-routing-over-plane-splits.
+
+**The hard routing gate (KiCad) — machine-enforced.** Nothing releases fab files until all pass:
+
+| Gate | Enforced by |
+|---|---|
+| ERC — 0 errors | `pcbflow` schematic gate |
+| DRC — 0 errors | `kicad-cli` + the project ruleset |
+| DFM — JLCPCB profile | `pcbflow dfm` |
+| Silkscreen — 0 over-pad/via | `pcbflow` silk check (+ `kicad-cli`) |
+| High-current nets on pours | `pcbflow route-check` |
+```bash
+pcbflow route-check netlist.enet board.kicad_pcb     # pour / width / length / return-path + silk
+pcbflow export my-board --approval approval.json     # HARD-BLOCKED until every gate passes + you approve
+```
+`export` refuses fab output until the routing gate passes **and** you record approval (checkpoint
+#2). Full electrical + integrity checks: `pcbflow hw` (see [`docs/HW_GAP_ANALYSIS.md`](docs/HW_GAP_ANALYSIS.md)).
+
+## 9. Roadmap
 
 - **✅ Built now:** the 12-phase workflow with **machine-computed gates** (each checkpoint runs
   its real checks) and a **hard-blocked manufacturing export**; the AI agent roster; EasyEDA +
@@ -195,7 +231,7 @@ rest.
 
 Full detail: [`ROADMAP.md`](ROADMAP.md).
 
-## 9. Notes
+## 10. Notes
 
 **Please read these — they set honest expectations.**
 
@@ -221,7 +257,7 @@ Full detail: [`ROADMAP.md`](ROADMAP.md).
 - **If something breaks:** just tell the AI *"something went wrong — read the log and fix
   it."* See [`reliability/TROUBLESHOOTING.md`](reliability/TROUBLESHOOTING.md).
 
-## 10. Contributing
+## 11. Contributing
 
 Contributions are welcome — from engineers and AI agents alike. In short: improve a
 **phase** (`workflow/`), a **tool** (`automation/`, `tools/`), or the **knowledge**

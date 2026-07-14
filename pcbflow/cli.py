@@ -329,6 +329,22 @@ def cmd_hw(a):
     return 0 if rep["pass"] else 1
 
 
+def cmd_route_check(a):
+    """Enforce the routing rulebook on a routed board: pour/width/length/return-path + silkscreen."""
+    from . import routing_check, routing_rules, silk_check
+    net = enet_mod.Enet.load(a.netlist)
+    rules = routing_rules.RoutingRules.beside(a.netlist)
+    fs = routing_check.run(net, a.board, rules) + silk_check.run(a.board)
+    if getattr(a, "json", False):
+        print(findings.to_json(fs))
+        return 0 if findings.report(fs)["pass"] else 1
+    rep = findings.report(fs)
+    print(f"route-check: {rep['errors']} error(s), {rep['warnings']} warning(s)"
+          f"  -> {'PASS' if rep['pass'] else 'FAIL'}")
+    _print_violations(fs)
+    return 0 if rep["pass"] else 1
+
+
 def cmd_import_check(a):
     """Phase-10 gate: does the KiCad board match the .enet netlist? (fails loudly on drift)."""
     fs, rep = import_diff.check(a.netlist, a.board)
@@ -433,6 +449,13 @@ def build_parser():
     hwp.add_argument("--board", default=None, help="a .kicad_pcb to add SI (impedance/length) + PDN checks")
     hwp.add_argument("--json", action="store_true", help="emit harmonized findings as JSON")
     hwp.set_defaults(fn=cmd_hw)
+
+    rc2 = sub.add_parser("route-check",
+                         help="enforce the routing rulebook on a board (pour/width/length/silk)")
+    rc2.add_argument("netlist", help="the .enet netlist (with routing_rules.json beside it)")
+    rc2.add_argument("board", help="the routed .kicad_pcb")
+    rc2.add_argument("--json", action="store_true", help="emit harmonized findings as JSON")
+    rc2.set_defaults(fn=cmd_route_check)
 
     ck = sub.add_parser("import-check",
                         help="verify a KiCad board matches its .enet netlist (fails loudly)")
