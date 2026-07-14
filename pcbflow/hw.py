@@ -9,7 +9,11 @@ All checks need the optional parts spec (`pcbflow.parts`); board checks need a `
 With missing data a check reports nothing (never guesses). Tiers 3–4 are scoped in
 docs/HW_IMPLEMENTATION_PLAN.md. Pure Python 3 standard library.
 """
-from . import erc_pins, kicad_sexp, pdn, power_tree, ratings, si, thermal
+import json
+from pathlib import Path
+
+from . import (bom_audit, creepage, dfa, erc_pins, feasibility_check, kicad_sexp, pdn,
+               power_tree, ratings, si, thermal)
 from .enet import Enet
 from .parts import Parts
 from .stackup import Stackup
@@ -30,10 +34,19 @@ def run(netlist, parts=None, board=None, stack=None):
     fs += pt_findings
     fs += ratings.run(enet, parts, rails)
     fs += thermal.run(enet, parts, rails)                 # T2 (no board needed)
+    fs += creepage.run(enet, rails)                       # T3 (offline)
+    fs += dfa.run(enet, parts)
+    fs += bom_audit.run(enet, parts)
 
     if board:                                             # T2 (routed geometry)
         geometry = kicad_sexp.read_pcb_geometry(board)
         stack = stack or Stackup.two_layer()              # caller overrides with stack= for 4-layer
         fs += si.run(enet, geometry, stack)
         fs += pdn.run(enet, geometry, stack, rails)
+
+    if not isinstance(netlist, Enet):                     # T4 (feasibility, if a spec is present)
+        fpath = Path(netlist).parent / "feasibility.json"
+        if fpath.exists():
+            spec = json.loads(fpath.read_text(encoding="utf-8"))
+            fs += feasibility_check.run(spec, {"components": len(enet.components)})
     return fs

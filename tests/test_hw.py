@@ -81,8 +81,10 @@ def test_current_budget_exceeded():
 def test_hw_findings_are_harmonized():
     e = _enet({"u": ("U1", {"1": "D"}), "v": ("U2", {"1": "D"})})
     p = Parts.from_dict({"U1": {"pins": {"1": "out"}}, "U2": {"pins": {"1": "out"}}})
+    hw_detectors = {"erc_pins", "power_tree", "ratings", "thermal", "creepage", "dfa",
+                    "bom_audit", "si", "pdn", "feasibility"}
     for f in hw.run(e, p):
-        assert findings.validate(f) == [] and f["detector"] in ("erc_pins", "power_tree", "ratings")
+        assert findings.validate(f) == [] and f["detector"] in hw_detectors
 
 
 def _run():

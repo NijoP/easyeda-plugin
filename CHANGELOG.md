@@ -7,6 +7,15 @@ All notable changes to PCB Flow are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- **Hardware Tiers 3 & 4 — manufacturing + requirements** (`pcbflow hw`):
+  - **creepage/clearance** (`pcbflow/creepage.py`): IPC-2221 spacing-vs-voltage — flags a board
+    whose clearance is below what its peak voltage needs (safety).
+  - **DFA/DFT** (`pcbflow/dfa.py`): fiducials, test-point coverage, and tombstoning risk (advisory).
+  - **BOM audit** (`pcbflow/bom_audit.py`): every BOM line must be orderable (MPN/LCSC).
+  - **feasibility traceability** (`pcbflow/feasibility_check.py`): the declared power/size/layer/
+    cost/part-count budgets are machine-checked against the actuals (catches silent scope drift).
+  All wired into `pcbflow hw`; the example runs clean (2 advisory info items for a minimal board).
+  Completes the hardware roadmap T1→T4 from `docs/HW_IMPLEMENTATION_PLAN.md`.
 - **Hardware Tier 2 — integrity checks** (`pcbflow hw --board`) — real physics on the routed board:
   - **signal integrity** (`pcbflow/si.py`): IPC-2141 microstrip impedance + differential-pair skew
     and equal-length matching — consuming the `.enet` `differentialPair`/`equalLengthNetGroup`/

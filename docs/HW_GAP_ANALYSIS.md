@@ -111,7 +111,7 @@ harness, but not yet an *electrical-correctness or integrity* harness — the ch
   nothing verifies the vias exist.
 - **Plugs in:** new detector reading the board → verification gate.
 
-## Tier 3 — Manufacturing & assembly reality (geometry DRC ≠ DFM/DFA)
+## Tier 3 — Manufacturing & assembly reality (geometry DRC ≠ DFM/DFA) — ✅ SHIPPED
 
 ### HW9 · Footprint audit (IPC-7351)  *(M)*
 - **Check:** pad geometry vs datasheet/IPC density level, courtyard, pin-1/polarity marking,
@@ -136,7 +136,7 @@ harness, but not yet an *electrical-correctness or integrity* harness — the ch
   panelization rules (V-score/mousebites, depanel edge clearance).
 - **Prevents:** arc-over / safety-cert failure; panel/depanel damage.
 
-## Tier 4 — Requirements ↔ design traceability
+## Tier 4 — Requirements ↔ design traceability — ✅ SHIPPED (HW14 mechanical deferred)
 
 ### HW13 · Requirements-to-design gate  *(S)*
 - **Check:** the stated **power budget, board size, layer count, and cost target** in

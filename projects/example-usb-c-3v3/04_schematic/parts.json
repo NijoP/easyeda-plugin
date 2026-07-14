@@ -10,7 +10,8 @@
     "ratings": {
       "v_nominal": 5.0,
       "iout_max": 3.0
-    }
+    },
+    "mpn": "USB4085-GF-A"
   },
   "U1": {
     "role": "ldo",
@@ -25,7 +26,8 @@
       "vout": 3.3,
       "vdropout": 0.25,
       "iout_max": 0.5
-    }
+    },
+    "mpn": "ME6211C33M5G-N"
   },
   "C1": {
     "role": "cap",
@@ -35,7 +37,8 @@
     },
     "ratings": {
       "v_rating": 16.0
-    }
+    },
+    "mpn": "CL10A106KP8NNNC"
   },
   "C2": {
     "role": "cap",
@@ -45,7 +48,8 @@
     },
     "ratings": {
       "v_rating": 16.0
-    }
+    },
+    "mpn": "CL10A106KP8NNNC"
   },
   "R1": {
     "role": "resistor",
@@ -56,7 +60,8 @@
     "ratings": {
       "r_ohm": 5100,
       "p_max": 0.063
-    }
+    },
+    "mpn": "0402WGF5101TCE"
   },
   "R2": {
     "role": "resistor",
@@ -67,7 +72,8 @@
     "ratings": {
       "r_ohm": 5100,
       "p_max": 0.063
-    }
+    },
+    "mpn": "0402WGF5101TCE"
   },
   "R3": {
     "role": "resistor",
@@ -78,7 +84,8 @@
     "ratings": {
       "r_ohm": 1000,
       "p_max": 0.063
-    }
+    },
+    "mpn": "0402WGF1001TCE"
   },
   "D1": {
     "role": "led",
@@ -91,6 +98,7 @@
       "i_typ": 0.013,
       "i_max": 0.02,
       "i_min": 0.001
-    }
+    },
+    "mpn": "KT-0603R"
   }
 }
