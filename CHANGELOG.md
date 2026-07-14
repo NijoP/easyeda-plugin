@@ -7,6 +7,18 @@ All notable changes to PCB Flow are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- **Codified placement via visual mapping** (`pcbflow place-plan`, P1) — placement is planned and
+  scored before it executes, never placed blind:
+  - `pcbflow/placement_intent.py`: a `placement_intent.json` sidecar capturing board outline,
+    connector→edge assignments, functional clusters, keep-outs, decoupling pairs, and sizes.
+  - `pcbflow/placer.py`: a deterministic force-directed optimizer that **minimizes HPWL**
+    (half-perimeter wirelength — the trace-length proxy), snaps decaps to their IC, pins
+    connectors to their edge, then legalizes courtyard overlaps. On the example: HPWL 240 → 42 mm.
+  - `pcbflow/render_svg.py`: a pure-Python SVG **visual map** (outline, courtyards, ratsnest) —
+    the artifact the engineer approves **before** placement executes (human checkpoint #1).
+  - `pcbflow/placement_check.py`: the placement gate — decoupling proximity (≤2 mm ok / 2–4 mm
+    WARN / >4 mm FAIL), connectors-on-edge, courtyard spacing (0.15 mm fab floor), keep-out
+    intrusion, and the HPWL metric. Every check has a known-bad test.
 - **Hardware Tiers 3 & 4 — manufacturing + requirements** (`pcbflow hw`):
   - **creepage/clearance** (`pcbflow/creepage.py`): IPC-2221 spacing-vs-voltage — flags a board
     whose clearance is below what its peak voltage needs (safety).

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="312" viewBox="0 0 480 312">
+<rect x="0" y="0" width="480" height="312" fill="#0d1117"/>
+<rect x="1" y="1" width="478" height="310" fill="none" stroke="#3fb950" stroke-width="2"/>
+<line x1="94.8" y1="300.0" x2="77.0" y2="300.0" stroke="#30363d" stroke-width="0.6"/>
+<line x1="12.0" y1="300.0" x2="77.0" y2="300.0" stroke="#30363d" stroke-width="0.6"/>
+<line x1="124.2" y1="300.0" x2="77.0" y2="300.0" stroke="#30363d" stroke-width="0.6"/>
+<line x1="124.2" y1="300.0" x2="77.6" y2="288.7" stroke="#30363d" stroke-width="0.6"/>
+<line x1="70.0" y1="258.6" x2="77.6" y2="288.7" stroke="#30363d" stroke-width="0.6"/>
+<line x1="74.0" y1="279.3" x2="77.6" y2="288.7" stroke="#30363d" stroke-width="0.6"/>
+<line x1="12.0" y1="300.0" x2="77.6" y2="288.7" stroke="#30363d" stroke-width="0.6"/>
+<line x1="94.8" y1="300.0" x2="77.6" y2="288.7" stroke="#30363d" stroke-width="0.6"/>
+<line x1="77.4" y1="300.0" x2="77.6" y2="288.7" stroke="#30363d" stroke-width="0.6"/>
+<line x1="91.0" y1="282.9" x2="77.6" y2="288.7" stroke="#30363d" stroke-width="0.6"/>
+<line x1="74.0" y1="279.3" x2="43.0" y2="289.6" stroke="#30363d" stroke-width="0.6"/>
+<line x1="12.0" y1="300.0" x2="43.0" y2="289.6" stroke="#30363d" stroke-width="0.6"/>
+<line x1="12.0" y1="300.0" x2="44.7" y2="300.0" stroke="#30363d" stroke-width="0.6"/>
+<line x1="77.4" y1="300.0" x2="44.7" y2="300.0" stroke="#30363d" stroke-width="0.6"/>
+<line x1="89.8" y1="265.5" x2="101.7" y2="282.8" stroke="#30363d" stroke-width="0.6"/>
+<line x1="124.2" y1="300.0" x2="101.7" y2="282.8" stroke="#30363d" stroke-width="0.6"/>
+<line x1="91.0" y1="282.9" x2="101.7" y2="282.8" stroke="#30363d" stroke-width="0.6"/>
+<line x1="89.8" y1="265.5" x2="79.9" y2="262.1" stroke="#30363d" stroke-width="0.6"/>
+<line x1="70.0" y1="258.6" x2="79.9" y2="262.1" stroke="#30363d" stroke-width="0.6"/>
+<rect x="88.8" y="296.4" width="12.0" height="7.2" fill="none" stroke="#58a6ff" stroke-width="1.2"/>
+<text x="94.8" y="300.0" fill="#c9d1d9" font-size="9" text-anchor="middle" dominant-baseline="middle">C1</text>
+<rect x="85.0" y="279.3" width="12.0" height="7.2" fill="none" stroke="#58a6ff" stroke-width="1.2"/>
+<text x="91.0" y="282.9" fill="#c9d1d9" font-size="9" text-anchor="middle" dominant-baseline="middle">C2</text>
+<rect x="60.4" y="253.2" width="19.2" height="10.8" fill="none" stroke="#58a6ff" stroke-width="1.2"/>
+<text x="70.0" y="258.6" fill="#c9d1d9" font-size="9" text-anchor="middle" dominant-baseline="middle">D1</text>
+<rect x="-42.0" y="276.0" width="108.0" height="48.0" fill="none" stroke="#d29922" stroke-width="1.2"/>
+<text x="12.0" y="300.0" fill="#c9d1d9" font-size="9" text-anchor="middle" dominant-baseline="middle">J1</text>
+<rect x="68.0" y="275.7" width="12.0" height="7.2" fill="none" stroke="#58a6ff" stroke-width="1.2"/>
+<text x="74.0" y="279.3" fill="#c9d1d9" font-size="9" text-anchor="middle" dominant-baseline="middle">R1</text>
+<rect x="71.4" y="296.4" width="12.0" height="7.2" fill="none" stroke="#58a6ff" stroke-width="1.2"/>
+<text x="77.4" y="300.0" fill="#c9d1d9" font-size="9" text-anchor="middle" dominant-baseline="middle">R2</text>
+<rect x="83.8" y="261.9" width="12.0" height="7.2" fill="none" stroke="#58a6ff" stroke-width="1.2"/>
+<text x="89.8" y="265.5" fill="#c9d1d9" font-size="9" text-anchor="middle" dominant-baseline="middle">R3</text>
+<rect x="106.2" y="282.0" width="36.0" height="36.0" fill="none" stroke="#58a6ff" stroke-width="1.2"/>
+<text x="124.2" y="300.0" fill="#c9d1d9" font-size="9" text-anchor="middle" dominant-baseline="middle">U1</text>
+</svg>

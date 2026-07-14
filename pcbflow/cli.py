@@ -288,6 +288,28 @@ def cmd_export(a):
     return 0
 
 
+def cmd_place_plan(a):
+    """Optimize placement (minimize trace length) and render a visual map to approve before
+    executing the placement in EasyEDA (human checkpoint #1)."""
+    from . import placement_check, placement_intent, placer, render_svg
+    net = enet_mod.Enet.load(a.netlist)
+    intent = (placement_intent.PlacementIntent.load(a.intent) if a.intent
+              else placement_intent.PlacementIntent.beside(a.netlist))
+    plan, metrics = placer.optimize(net, intent)
+    fs = placement_check.run(plan, intent, net)
+    if a.out:
+        Path(a.out).write_text(json.dumps({"plan": plan, "metrics": metrics}, indent=2))
+    if a.svg:
+        render_svg.render(plan, intent, net, a.svg)
+    rep = findings.report(fs)
+    print(f"place-plan: HPWL {metrics['hpwl_initial']} → {metrics['hpwl_final']} mm; "
+          f"{rep['errors']} error(s), {rep['warnings']} warning(s)  -> {'PASS' if rep['pass'] else 'FAIL'}")
+    _print_violations(fs)
+    if a.svg:
+        print(f"  visual map -> {a.svg}  (approve this before executing the placement)")
+    return 0 if rep["pass"] else 1
+
+
 def cmd_hw(a):
     """Hardware-correctness checks (Tier 1): pin-type ERC, power tree, component ratings.
     Needs a parts.json beside the netlist (electrical types + ratings)."""
@@ -397,6 +419,14 @@ def build_parser():
     vf.add_argument("--board", default=None, help="optional board-features JSON for DFM")
     vf.add_argument("--json", action="store_true", help="emit the full audit as JSON")
     vf.set_defaults(fn=cmd_verify)
+
+    pp = sub.add_parser("place-plan",
+                        help="optimize placement (min trace length) + render a visual map to approve")
+    pp.add_argument("netlist")
+    pp.add_argument("--intent", default=None, help="placement_intent.json (else auto-loaded beside netlist)")
+    pp.add_argument("--out", default=None, help="write the machine-readable placement plan JSON")
+    pp.add_argument("--svg", default=None, help="write the visual map SVG (approve before executing)")
+    pp.set_defaults(fn=cmd_place_plan)
 
     hwp = sub.add_parser("hw", help="hardware checks: pin-type ERC, power tree, ratings, SI/PDN, thermal")
     hwp.add_argument("netlist", help="the .enet netlist (with a parts.json beside it)")
