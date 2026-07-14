@@ -1,0 +1,33 @@
+# pcbflow
+
+> AI-assisted PCB design workspace and method: take a hardware project from requirements to
+> manufacturing-ready files with EasyEDA (schematic + placement) and KiCad (routing +
+> verification), with the engineer in the loop for every decision that carries risk. Core is
+> Python 3 standard library; it is model-agnostic (works with any AI coding agent that reads
+> Markdown).
+
+## Start here
+- [README](README.md): what it is, the 12-phase workflow, getting started.
+- [Handbook](handbook/README.md): step-by-step guide for engineers.
+- [CLAUDE.md](CLAUDE.md) / [AGENTS.md](AGENTS.md): how an AI assistant works in this repo.
+
+## Method
+- [workflow/](workflow/): the 12 phases, each with a machine-checked checkpoint.
+- [agents/](agents/): the role definition for each phase.
+- [knowledge/](knowledge/): engineering rules — IPC-2221 widths, DFM floor, design standards,
+  the append-only learning log.
+
+## Tools (the `pcbflow` CLI)
+- `pcbflow verify <netlist.enet>`: offline schematic audit (structure + ERC).
+- `pcbflow import-check <netlist.enet> <board.kicad_pcb>`: prove the KiCad board matches the netlist.
+- `pcbflow gate <project> <phase>`: compute a phase gate by running its checks.
+- `pcbflow export <project> --approval a.json`: manufacturing export, hard-blocked until gates
+  pass AND a human has approved (never auto-signs, never orders).
+- `make example`: reproduce the reference board end-to-end (DRC-clean + gerbers).
+
+## Reference
+- [Worked example](projects/example-usb-c-3v3/README.md): USB-C → 3.3 V + LED, reproducible end to end.
+- [docs/CONFIG.md](docs/CONFIG.md): every environment variable.
+- [install-guidance.md](install-guidance.md): platform quirks for the AI agent.
+- [VALIDATION.md](VALIDATION.md): what is tested vs. needs-live-validation.
+- [CHANGELOG.md](CHANGELOG.md) · [ROADMAP.md](ROADMAP.md) · [ARCHITECTURE.md](ARCHITECTURE.md)

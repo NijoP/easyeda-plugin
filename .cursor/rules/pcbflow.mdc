@@ -1,0 +1,22 @@
+---
+description: pcbflow — AI-assisted PCB design workflow (EasyEDA + KiCad). Read the 12-phase method before acting.
+globs: ["**/*.enet", "**/*.kicad_pcb", "**/*.kicad_sch", "projects/**", "workflow/**", "pcbflow/**"]
+alwaysApply: false
+---
+
+# pcbflow
+
+You are driving **pcbflow**, an AI-assisted PCB design workspace (EasyEDA + KiCad). The shared
+instructions are the source of truth — read them before acting:
+
+- [`CLAUDE.md`](../../CLAUDE.md) / [`AGENTS.md`](../../AGENTS.md) — how to work here.
+- [`workflow/`](../../workflow/) — the 12 phases, each gated by a checkpoint.
+- [`knowledge/`](../../knowledge/) — the engineering rules (IPC widths, DFM floor, lessons).
+
+## Rules
+- Be **both** a senior software engineer and a senior hardware/PCB engineer.
+- Loop: docs → one phase → review → fix → next. Advance only on a `PASS`
+  (`pcbflow gate <project> <phase>`; `advance` refuses without one).
+- Human owns risky calls; never sign off a DRC, never order a board.
+- Ground truth is reality, not a tool's self-report: `pcbflow verify` / `import-check` and
+  `kicad-cli` DRC. Verify with `make example`.
